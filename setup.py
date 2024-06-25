@@ -24,9 +24,8 @@ setup(
     url="https://example.com",
     entry_points={
         "qiime2.plugins": [
-            "q2_asap="
-            "q2_asap"
-            ".plugin_setup:plugin"]
+            "q2_asap=q2_asap.plugin_setup:plugin",
+            ]
     },
     package_data={
         "q2_asap": ["citations.bib"],

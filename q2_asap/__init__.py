@@ -14,3 +14,10 @@ del get_versions
 
 from . import _version
 __version__ = _version.get_versions()['version']
+
+from ._formats import (ASAPXMLOutputDirFmt, ASAPXMLFormat, ASAPHTMLOutputDirFmt, ASAPHTMLFormat)
+
+__all__ = [
+    'ASAPXMLOutputDirFmt', 'ASAPXMLFormat',
+    'ASAPHTMLOutputDirFmt', 'ASAPHTMLFormat'
+]

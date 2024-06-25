@@ -6,12 +6,18 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Citations, Plugin
-from q2_types.feature_table import FeatureTable, Frequency
-from q2_asap import __version__
-from q2_asap._methods import duplicate_table
-
+from qiime2.plugin import Citations, Plugin, SemanticType
 citations = Citations.load("citations.bib", package="q2_asap")
+from q2_asap import __version__
+
+from q2_asap.analyzeAmplicons import analyzeAmplicons
+from q2_types.per_sample_sequences import PairedEndSequencesWithQuality, SequencesWithQuality
+from q2_types.sample_data import SampleData
+
+from q2_types.per_sample_sequences._type import AlignmentMap
+from ._formats import ASAPXMLFormat, ASAPHTMLFormat, ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt
+from ._types import ASAPXML, ASAPHTML
+from q2_nasp2_types.index import BWAIndex
 
 plugin = Plugin(
     name="ASAP",
@@ -26,16 +32,38 @@ plugin = Plugin(
     citations=[citations['Caporaso-Bolyen-2024']]
 )
 
+
 plugin.methods.register_function(
-    function=duplicate_table,
-    inputs={'table': FeatureTable[Frequency]},
+    function=analyzeAmplicons,
+    inputs={'sequences': SampleData[PairedEndSequencesWithQuality]},
     parameters={},
-    outputs=[('new_table', FeatureTable[Frequency])],
-    input_descriptions={'table': 'The feature table to be duplicated.'},
+    outputs=[
+             ('output_bams', SampleData[AlignmentMap]),
+             ('bwa_index', BWAIndex),
+             ('asap_xmls', ASAPXML),
+             ('asap_htmls', ASAPHTML)
+             ],
+    input_descriptions={'sequences': 'The amplicon sequences to be analyzed'},
     parameter_descriptions={},
-    output_descriptions={'new_table': 'The duplicated feature table.'},
-    name='Duplicate table',
-    description=("Create a copy of a feature table with a new uuid. "
-                 "This is for demonstration purposes only. 🧐"),
+    output_descriptions={
+        'output_bams': 'SampleData[AlignmentMap]',
+        'bwa_index': 'BWAIndex',
+        'asap_xmls': 'ASAPXMLOutputDirFmt',
+        'asap_htmls': 'ASAPHTMLOutputDirFmt',
+        },
+    name='analyzeAmplicons',
+    description=(""),
     citations=[]
 )
+
+plugin.register_formats( ASAPHTMLOutputDirFmt, ASAPXMLOutputDirFmt)
+# plugin.register_semantic_types(ASAPHTMLOutputs)
+plugin.register_semantic_type_to_format(
+    ASAPHTML, artifact_format = ASAPHTMLOutputDirFmt, 
+)
+# plugin.register_semantic_types(ASAPXMLOutputs)
+plugin.register_semantic_type_to_format(
+    ASAPXML, artifact_format = ASAPXMLOutputDirFmt, 
+)
+
+
