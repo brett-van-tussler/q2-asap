@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Citations, Plugin, SemanticType
+from qiime2.plugin import Citations, Plugin, SemanticType, Str, Int, Float
 citations = Citations.load("citations.bib", package="q2_asap")
 from q2_asap import __version__
 
@@ -18,6 +18,9 @@ from q2_types.per_sample_sequences._type import AlignmentMap
 from ._formats import ASAPXMLFormat, ASAPHTMLFormat, ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt
 from ._types import ASAPXML, ASAPHTML
 from q2_nasp2_types.index import BWAIndex
+from q2_nasp2_types.alignment import BAM
+from q2_types.feature_data import FeatureData
+
 
 plugin = Plugin(
     name="ASAP",
@@ -36,20 +39,34 @@ plugin = Plugin(
 plugin.methods.register_function(
     function=analyzeAmplicons,
     inputs={'sequences': SampleData[PairedEndSequencesWithQuality]},
-    parameters={},
+    parameters={'name': Str,
+                'depth': Int,
+                'breadth': Float,
+                'min_base_qual': Int,
+                'consensus_proportion': Float,
+                'fill_gaps': Str,
+                'aligner': Str,
+                'aligner_args': Str
+                },
     outputs=[
-             ('output_bams', SampleData[AlignmentMap]),
+             ('output_bams', FeatureData[BAM]),
              ('bwa_index', BWAIndex),
-             ('asap_xmls', ASAPXML),
-             ('asap_htmls', ASAPHTML)
+             ('asap_xmls', ASAPXML)
              ],
     input_descriptions={'sequences': 'The amplicon sequences to be analyzed'},
-    parameter_descriptions={},
+    parameter_descriptions={
+                'name': 'Str',
+                'depth': 'Int',
+                'breadth': 'Float',
+                'min_base_qual': 'Int',
+                'consensus_proportion': 'Float',
+                'fill_gaps': 'Str',
+                'aligner': 'Str',
+                'aligner_args': 'Str'},
     output_descriptions={
         'output_bams': 'SampleData[AlignmentMap]',
         'bwa_index': 'BWAIndex',
-        'asap_xmls': 'ASAPXMLOutputDirFmt',
-        'asap_htmls': 'ASAPHTMLOutputDirFmt',
+        'asap_xmls': 'ASAPXMLOutputDirFmt'
         },
     name='analyzeAmplicons',
     description=(""),
