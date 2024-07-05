@@ -32,7 +32,7 @@ plugin = Plugin(
     # Please retain the plugin-level citation of 'Caporaso-Bolyen-2024'
     # as attribution of the use of this template, in addition to any citations
     # you add.
-    citations=[citations['Caporaso-Bolyen-2024']]
+    citations=[citations['Caporaso-Bolyen-2024'], citations['ASAP']]
 )
 
 
@@ -55,22 +55,25 @@ plugin.methods.register_function(
              ],
     input_descriptions={'sequences': 'The amplicon sequences to be analyzed'},
     parameter_descriptions={
-                'name': 'Str',
-                'depth': 'Int',
-                'breadth': 'Float',
-                'min_base_qual': 'Int',
-                'consensus_proportion': 'Float',
-                'fill_gaps': 'Str',
-                'aligner': 'Str',
-                'aligner_args': 'Str'},
+                'name': 'Name of ASAP run',
+                'depth': 'minimum read depth required to consider a position covered. [default: 100]',
+                'breadth': 'minimum breadth of coverage required to consider an amplicon as present. [default: 0.8]',
+                'min_base_qual': 'what is the minimum base quality score (BQS) to use a position (Phred scale, i.e. 10=90, 20=99, 30=99.9 accuracy',
+                'consensus_proportion': 'minimum proportion required to call at base at that position, else 'N'. [default: 0.8]',
+                'fill_gaps': 'fill no coverage gaps in the consensus sequence [default: False], optional parameter is the character to use for filling [defaut: n]',
+                'aligner': 'aligner to use for read mapping, supports bowtie2, novoalign, and bwa. [default: bowtie2]',
+                'aligner_args': "additional arguments to pass to the aligner, enclosed in ''."},
     output_descriptions={
-        'output_bams': 'SampleData[AlignmentMap]',
-        'bwa_index': 'BWAIndex',
-        'asap_xmls': 'ASAPXMLOutputDirFmt'
+        'output_bams': 'directory of bam files',
+        'bwa_index': 'directory of files that hold BWA indices used to align sequencing reads to the reference genome',
+        'asap_xmls': 'directory of XML files with complete details for each assay against each sample. \
+                        These details include number of reads aligning to each target, any SNPs found above a user-defined threshold, \
+                        and the nucleotide distribution at each of these SNP positions. For ROI assays, the output includes the sequence \
+                        distribution at each of the regions of interest -- both the DNA sequences and translated into amino acid sequences.'
         },
     name='analyzeAmplicons',
     description=(""),
-    citations=[]
+    citations=[citations['ASAP']]
 )
 
 plugin.register_formats( ASAPHTMLOutputDirFmt, ASAPXMLOutputDirFmt)
