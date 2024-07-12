@@ -7,38 +7,29 @@
 # ----------------------------------------------------------------------------
 
 import pandas as pd
-import pandas.testing as pdt
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin.util import transform
-from q2_types.feature_table import BIOMV100Format
+from qiime2 import Artifact
 
-from q2_asap._methods import duplicate_table
+# from q2_asap.analyzeAmplicons_pipeline import analyzeAmplicons_pipeline
 
-
-class DuplicateTableTests(TestPluginBase):
+class TestAnalyzeAmpliconPipeline(TestPluginBase):
     package = 'q2_asap.tests'
 
-    def test_simple1(self):
-        in_table = pd.DataFrame(
-            [[1, 2, 3, 4, 5], [9, 10, 11, 12, 13]],
-            columns=['abc', 'def', 'jkl', 'mno', 'pqr'],
-            index=['sample-1', 'sample-2'])
-        observed = duplicate_table(in_table)
+    def test_analyzeAmplicon_pipeline(self):
+        # access the pipeline as QIIME 2 sees it,
+        # for correct assignment of `ctx` variable
+        analyzeAmplicons_pipeline = self.plugin.pipelines['analyzeAmplicons_pipeline']
 
-        expected = in_table
+        #import artifact for reference sequence
+        ref_sequence_artifact = Artifact.import_data('FeatureData[Sequence]', '/home/nsylvester/scratch/q2-asap/q2_asap/tests/data/wuhan_sequence.fasta')
 
-        pdt.assert_frame_equal(observed, expected)
+        # get sequences (paired-end-demux.qza)
+        sequences_artifact = Artifact.load('q2_asap/tests/data/paired-end-demux.qza')
 
-    def test_simple2(self):
-        # test table duplication with table loaded from file this time
-        # (for demonstration purposes)
-        in_table = transform(
-            self.get_data_path('table-1.biom'),
-            from_type=BIOMV100Format,
-            to_type=pd.DataFrame)
-        observed = duplicate_table(in_table)
+        # run the pipeline
+        results = analyzeAmplicons_pipeline(sequences = sequences_artifact, ref_sequence = ref_sequence_artifact)
 
-        expected = in_table
-
-        pdt.assert_frame_equal(observed, expected)
+        # assert output
+        self.assertTrue(len(results) > 0)

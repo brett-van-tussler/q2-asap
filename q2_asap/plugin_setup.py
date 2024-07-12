@@ -18,8 +18,11 @@ from q2_types.per_sample_sequences._type import AlignmentMap
 from ._formats import ASAPXMLFormat, ASAPHTMLFormat, ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt
 from ._types import ASAPXML, ASAPHTML
 from q2_nasp2_types.index import BWAIndex
-from q2_nasp2_types.alignment import BAM
-from q2_types.feature_data import FeatureData
+from q2_nasp2_types.alignment import BAMIndexed, SAM
+from q2_types.feature_data import FeatureData, Sequence
+from q2_asap.analyzeAmplicons_pipeline import analyzeAmplicons_pipeline
+from q2_types.bowtie2 import Bowtie2Index
+
 
 
 plugin = Plugin(
@@ -49,7 +52,7 @@ plugin.methods.register_function(
                 'aligner_args': Str
                 },
     outputs=[
-             ('output_bams', FeatureData[BAM]),
+             ('output_bams', FeatureData[BAMIndexed]),
              ('bwa_index', BWAIndex),
              ('asap_xmls', ASAPXML)
              ],
@@ -59,7 +62,7 @@ plugin.methods.register_function(
                 'depth': 'minimum read depth required to consider a position covered. [default: 100]',
                 'breadth': 'minimum breadth of coverage required to consider an amplicon as present. [default: 0.8]',
                 'min_base_qual': 'what is the minimum base quality score (BQS) to use a position (Phred scale, i.e. 10=90, 20=99, 30=99.9 accuracy',
-                'consensus_proportion': 'minimum proportion required to call at base at that position, else 'N'. [default: 0.8]',
+                'consensus_proportion': 'minimum proportion required to call at base at that position, else "N". [default: 0.8]',
                 'fill_gaps': 'fill no coverage gaps in the consensus sequence [default: False], optional parameter is the character to use for filling [defaut: n]',
                 'aligner': 'aligner to use for read mapping, supports bowtie2, novoalign, and bwa. [default: bowtie2]',
                 'aligner_args': "additional arguments to pass to the aligner, enclosed in ''."},
@@ -86,4 +89,31 @@ plugin.register_semantic_type_to_format(
     ASAPXML, artifact_format = ASAPXMLOutputDirFmt, 
 )
 
+
+# register analyzeAmplicon pipeline
+plugin.pipelines.register_function(
+    function=analyzeAmplicons_pipeline,
+    inputs={
+        'sequences':  (SampleData[SequencesWithQuality] | SampleData[PairedEndSequencesWithQuality]),
+        'ref_sequence': FeatureData[Sequence],
+    },
+    parameters={'config_file_path': Str},
+    outputs=[
+        # ('trimmer_results', (SampleData[SequencesWithQuality] | SampleData[PairedEndSequencesWithQuality])),
+        # ('aligner_index_result', (BWAIndex | Bowtie2Index)),
+        ('aligner_result', FeatureData[SAM])
+    ],
+    input_descriptions={
+        'sequences': 'the sequences to be analyzed',
+        'ref_sequence': 'The reference sequence used to build bwa index.',
+    },
+    parameter_descriptions={'config_file_path': 'path to config file that holds all params'},
+    output_descriptions={
+        # 'trimmer_results': 'The results after completing trimming',
+        # 'aligner_index_result': 'The resulting aligner index',
+        'aligner_result': 'The result of aligning reads with specified aligner'
+    },
+    name='Analyze Amplicons Pipeline',
+    description=("A pipeline to run analyze amplicons")
+) 
 

@@ -48,10 +48,19 @@ def analyzeAmplicons(sequences: CasavaOneEightSingleLanePerSampleDirFmt, name: s
     output_dir_bam = BAMSortedAndIndexedDirFmt()
     output_dir_bwa = BWAIndexDirFmt()
     output_dir_xml = ASAPXMLOutputDirFmt()
+    
+
+    result = subprocess.run(['ls', '-l', f'{sequences}'], stdout=subprocess.PIPE, text=True)
+    print(result)
+    print(os.listdir(f'{sequences}'))
+    subprocess.run(['mkdir', '-p', 'sequences'], check=True)
+    shutil.copytree(f'{sequences}', 'sequences', dirs_exist_ok=True)
 
     # create analyzeAmplicons command
-    command = f'analyzeAmplicons -r {sequences} -n {name} -o {temp_dir}/asap_output -d {depth} -b {breadth} -j /scratch/nsylvester/SARS2_variant_detection.json \
+    command = f'analyzeAmplicons -r sequences -n {name} -o {temp_dir}/asap_output -d {depth} -b {breadth} -j /home/nsylvester/scratch/q2-asap/q2_asap/tests/data/SARS2_variant_detection.json \
     --min_base_qual {min_base_qual} --consensus-proportion {consensus_proportion} --fill-gaps {fill_gaps} -a {aligner} --aligner-args {aligner_args}'
+
+    print(command)
 
     # combine conda environment and command TODO: fix conda environment
     shell_script= f"""
@@ -75,14 +84,14 @@ def analyzeAmplicons(sequences: CasavaOneEightSingleLanePerSampleDirFmt, name: s
     for file_name in os.listdir(asap_output_dir):
         file_path = os.path.join(asap_output_dir, file_name)
         if re.search(r'\.(amb|ann|bwt|pac|sa|fasta)$', file_name):
-            shutil.move(file_path, Path(output_dir_bwa.path) / file_name)
+            shutil.copy(file_path, Path(output_dir_bwa.path) / file_name)
         elif re.search(r'\.xml$', file_name):
-                shutil.move(file_path, Path(output_dir_xml.path) / file_name)
+                shutil.copy(file_path, Path(output_dir_xml.path) / file_name)
 
     # move bam files
     for file_name in os.listdir(os.path.join(asap_output_dir, "bwamem")):
         file_path = os.path.join(asap_output_dir, "bwamem", file_name)
-        shutil.move(file_path, Path(output_dir_bam.path) / file_name)
+        shutil.copy(file_path, Path(output_dir_bam.path) / file_name)
 
     #  remove temp directory
     # shutil.rmtree(temp_dir)
