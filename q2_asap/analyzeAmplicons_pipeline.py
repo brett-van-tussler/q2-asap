@@ -1,3 +1,5 @@
+import json
+
 #TODO: config file for bbduk/fastp/trimmer params
 #TODO: bamprocessor, outputCombiner
 def analyzeAmplicons_pipeline(ctx, sequences, ref_sequence, config_file_path):

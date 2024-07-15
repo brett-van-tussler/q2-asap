@@ -26,10 +26,12 @@ class TestAnalyzeAmpliconPipeline(TestPluginBase):
         ref_sequence_artifact = Artifact.import_data('FeatureData[Sequence]', '/home/nsylvester/scratch/q2-asap/q2_asap/tests/data/wuhan_sequence.fasta')
 
         # get sequences (paired-end-demux.qza)
-        sequences_artifact = Artifact.load('q2_asap/tests/data/paired-end-demux.qza')
+        sequences_artifact = Artifact.load('q2_asap/tests/data/paired-end-demux-modified.qza')
+
+        config_fp='/home/nsylvester/scratch/q2-asap/q2_asap/tests/data/SARS2_variant_detection.json'
 
         # run the pipeline
-        results = analyzeAmplicons_pipeline(sequences = sequences_artifact, ref_sequence = ref_sequence_artifact)
+        results = analyzeAmplicons_pipeline(sequences = sequences_artifact, ref_sequence = ref_sequence_artifact, config_file_path=config_fp)
 
         # assert output
         self.assertTrue(len(results) > 0)
