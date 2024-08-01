@@ -17,45 +17,64 @@ asap.formatOutput
 import os
 import lxml.etree as ET
 import glob
+from typing import Optional
 from ._formats import ASAPXMLOutputDirFmt
 
 
 def distinct_values(context, values):
     return list(set(values))
 
-# TODO: create a new dir format for single xml, create a transformer for it, maybe get rid of output combiner
-def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, stylesheet: str, text: bool) -> None:
+def list_non_html_files_recursively():
+    non_html_files = []
+    
+    # Walk through the directory tree
+    for root, dirs, files in os.walk(os.getcwd()):
+        for file in files:
+            if not file.endswith('.html'):
+                full_path = os.path.join(root, file)
+                # Calculate the relative path
+                relative_path = os.path.relpath(full_path, os.getcwd())
+                non_html_files.append(relative_path)
+    
+    return non_html_files
 
-    # TODO: figure out what this code does?
+def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, stylesheet: str, text: Optional[bool] = False) -> None:
+
     ns = ET.FunctionNamespace("http://pathogen.tgen.org/ASAP/functions")
     ns['distinct-values'] = distinct_values
 
-    # parser = ET.XMLParser(huge_tree=True)
-    # dom = ET.parse(xml_file, parser=parser)
     path_name = glob.glob(os.path.join(asap_xml_artifact.path, '*'))[0]
 
     dom = ET.parse(path_name)
+    run_name = dom.getroot().attrib.get("run_name")
     xslt = ET.parse(stylesheet)
     transform = ET.XSLT(xslt)
+
+    current_dir = os.getcwd()
+    os.chdir(output_dir)
+    os.mkdir(run_name)
     newdom = transform(dom)
+    os.chdir(current_dir)
+
 
     if text:
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
             fh.write(_html_template % repr(newdom))
     else:
-        # format_output_dir = os.path.join(output_dir, "formatted_output")
-        # os.mkdir(format_output_dir)
-        # print(os.path.join(format_output_dir, "toplevel.html"))
-        with open(output_dir + "test.html", "wb") as o:
-           print(ET.tostring(newdom, pretty_print=True,
-                                        xml_declaration=True,
-                                        encoding='UTF-8'))
+        with open(os.path.join(output_dir, run_name + ".html"), "wb") as o:
            o.write(ET.tostring(newdom, pretty_print=True,
                                         xml_declaration=True,
                                         encoding='UTF-8'))
-        print(os.path.join(output_dir, "index.html"))
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
-            fh.write(_html_template % repr("<a href=\""+ output_dir + "\">formatted output</a>"))
+            format_output_link = "<a href=\"{}.html\">formatted output</a>"
+            os.chdir(output_dir)
+            files = list_non_html_files_recursively()
+            os.chdir(current_dir)
+            file_links = ""
+            for file in files:  
+                file_links += "<br><a href=\"{0}\">{0}</a>".format(file)
+            fh.write(_html_template % (format_output_link + file_links))
+
 
 _html_template = """
 <!DOCTYPE html>

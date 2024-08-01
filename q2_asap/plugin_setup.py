@@ -88,11 +88,11 @@ plugin.pipelines.register_function(
         'sequences': 'The sequences to be analyzed',
         'ref_sequence': 'The reference sequence used to build bwa index'
     },
-    parameter_descriptions={'trimmer': 'the trimmer to use',
-                            'aligner_index': 'the aligner index to use',
-                            'aligner': 'type of aligner to use',
-                            'run_name': 'the name of the pipeline run',
-                            'config_fp': 'the path to the config file'
+    parameter_descriptions={'trimmer': 'The trimmer to use',
+                            'aligner_index': 'The aligner index to use',
+                            'aligner': 'Type of aligner to use',
+                            'run_name': 'The name of the pipeline run',
+                            'config_fp': 'The path to the config file'
                             },
     output_descriptions={
         'trimmer_results': 'The result after completing trimming',
@@ -150,8 +150,8 @@ plugin.visualizers.register_function(
                 },
     input_descriptions={'asap_xml_artifact': 'The combined xml file to style'},
     parameter_descriptions={'stylesheet': 'The xslt stylesheet',
-                            'text': 'Output as text bool'},
+                            'text': 'Output as text bool. If you select text, the output will be stored directly into the qiime index.html file.'},
     name='formatOutput',
-    description=(""),
+    description=("Input your own designed XSLT transform or use a pre-made one. Non html files generated will be linked in the index.html for download"),
     citations=[citations['ASAP']]
 )
