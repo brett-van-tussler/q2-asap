@@ -23,8 +23,8 @@ def analyzeAmplicons_pipeline(ctx, sequences, ref_sequence, trimmer, aligner,
                                                  config_file_path=config_fp)
     results.append(bam_processor_result)
     
-    #TODO: is this in pipeline?
     output_combiner_result, = output_combiner_action(xml_dir=bam_processor_result, run_name=run_name)
     results.append(output_combiner_result)
 
     return tuple(results)
+
