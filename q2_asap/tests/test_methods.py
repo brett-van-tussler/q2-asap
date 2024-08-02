@@ -12,7 +12,9 @@ from q2_asap.outputCombiner import outputCombiner
 from q2_asap._formats import ASAPXMLOutputDirFmt
 from q2_asap.bamProcessor import bamProcessor
 from q2_nasp2_types.alignment import BAMSortedAndIndexedDirFmt
-
+from q2_types.per_sample_sequences import PairedEndSequencesWithQuality
+from q2_types.sample_data import SampleData
+from q2_types.per_sample_sequences import SingleLanePerSamplePairedEndFastqDirFmt
 
 class TestAnalyzeAmpliconPipeline(TestPluginBase):
     package = 'q2_asap.tests'
@@ -30,6 +32,9 @@ class TestAnalyzeAmpliconPipeline(TestPluginBase):
         # load in sequences (paired-end-demux.qza)
         sequences_artifact = Artifact.load(
             'q2_asap/tests/data/paired-end-demux-modified.qza')
+        
+
+        print("TYPE" + str(type(sequences_artifact)))
 
         config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
 

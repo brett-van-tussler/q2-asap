@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Citations, Plugin, Str, TypeMap, Choices, Bool
+from qiime2.plugin import Citations, Plugin, Str, TypeMap, Choices, Bool, Collection
 from q2_asap import __version__
 from q2_types.per_sample_sequences import (PairedEndSequencesWithQuality,
                                            SequencesWithQuality)
@@ -54,13 +54,13 @@ plugin.register_semantic_type_to_format(
 # maps input types to output types
 aligner_type, sequences, trimmer_out, index_out = TypeMap({
     (Str % Choices(['bwa_mem_single']), SampleData[SequencesWithQuality]):
-        (SampleData[SequencesWithQuality], BWAIndex),
+        (Collection[SampleData[SequencesWithQuality]], Collection[BWAIndex]),
     (Str % Choices(['bwa_mem_paired']),
         SampleData[PairedEndSequencesWithQuality]):
-        (SampleData[PairedEndSequencesWithQuality], BWAIndex),
+        (Collection[SampleData[PairedEndSequencesWithQuality]], Collection[BWAIndex]),
     (Str % Choices(['bowtie2']),
         SampleData[PairedEndSequencesWithQuality]):
-        (SampleData[PairedEndSequencesWithQuality], Bowtie2Index),
+        (Collection[SampleData[PairedEndSequencesWithQuality]], Collection[Bowtie2Index]),
 })
 
 # register analyzeAmplicon pipeline
@@ -80,8 +80,8 @@ plugin.pipelines.register_function(
     outputs=[
         ('trimmer_results', trimmer_out),
         ('aligner_index_result', index_out),
-        ('aligner_result', SampleData[AlignmentMap]),
-        ('bam_processor_result', ASAPXML),
+        ('aligner_result', Collection[SampleData[AlignmentMap]]),
+        ('bam_processor_result', Collection[ASAPXML]),
         ('output_combiner_result', ASAPXML)
     ],
     input_descriptions={
@@ -155,3 +155,5 @@ plugin.visualizers.register_function(
     description=("Input your own designed XSLT transform or use a pre-made one. Non html files generated will be linked in the index.html for download"),
     citations=[citations['ASAP']]
 )
+
+
