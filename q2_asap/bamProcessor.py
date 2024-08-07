@@ -156,8 +156,7 @@ def _primer_mask(primer_file, bam_file_name, wiggle, pmaskbam, ponlybam, smor):
                             len(read.query_sequence)
                             if mask_end > len(read.query_sequence)
                             else mask_end)
-                        # print("found one")
-                        # This will work if using qual later for calling
+                      
                         read.query_qualities[:mask_end] = arr.array(
                             "B", [0] * mask_end)
                         if mask_bases:
@@ -246,7 +245,7 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
         if fill_gap_char:
             # We've skipped some positions in the alignment
             if previous_position+1 < position:
-                print("%i, %i" % (previous_position, position))
+                # print("%i, %i" % (previous_position, position))
                 for i in range(previous_position+1, position):
                     gapfilled_consensus_seq += fill_gap_char  # Fill in the gap
         previous_position = position
@@ -1265,7 +1264,6 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         con_prop = bamProcessor["consensus_proportion"]
         fill_gap_char = bamProcessor["gap_char"]
         fill_del_char = bamProcessor["del_char"]
-        out = bamProcessor["out"]
         output_format = bamProcessor["output_format"]
 
         if smor:
@@ -1282,7 +1280,6 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         # TODO: dont leave this line validate only one is found
         alignment_map_fp = glob.glob(str(alignment_map.path) + "/*.bam")[0]
         check_index = glob.glob(str(alignment_map.path) + "/*.bam*")
-        print('bam processor: all files ' + str(check_index))
         samdata = pysam.AlignmentFile(alignment_map_fp, "rb")
 
         sample_dict = {}
@@ -1490,8 +1487,8 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         if samdata.is_open():
             samdata.close()
 
-        xml_output_dir = ASAPXMLOutputDirFmt()
-        output_file_path = Path(xml_output_dir.path) / Path(out)
+        xml_output_artifact = ASAPXMLOutputDirFmt()
+        output_file_path = Path(xml_output_artifact.path) / Path(os.path.splitext(os.path.basename(alignment_map_fp))[0] + ".xml")
 
         with open(output_file_path, 'w') as file_obj:
             _write_output(file_obj, sample_node, output_format)
@@ -1499,7 +1496,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
     except KeyboardInterrupt:
         pass
 
-    return xml_output_dir
+    return xml_output_artifact
 
 
 def _write_output(file_obj, xml_element, output_format='xml'):

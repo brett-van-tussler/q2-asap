@@ -19,7 +19,7 @@ from q2_nasp2_types.alignment import BAMSortedAndIndexed, SAM
 from q2_types.feature_data import FeatureData, Sequence
 from q2_types.bowtie2 import Bowtie2Index
 from q2_asap.analyzeAmplicons_pipeline import analyzeAmplicons_pipeline
-from q2_asap.outputCombiner import outputCombiner
+from q2_asap.outputCombiner import (outputCombiner, xmlCollectionCombiner, alignedCollectionCombiner, trimmedCollectionCombiner)
 from q2_asap.bamProcessor import bamProcessor
 from q2_asap.formatOutput import formatOutput
 
@@ -54,13 +54,13 @@ plugin.register_semantic_type_to_format(
 # maps input types to output types
 aligner_type, sequences, trimmer_out, index_out = TypeMap({
     (Str % Choices(['bwa_mem_single']), SampleData[SequencesWithQuality]):
-        (Collection[SampleData[SequencesWithQuality]], Collection[BWAIndex]),
+        (SampleData[SequencesWithQuality], BWAIndex),
     (Str % Choices(['bwa_mem_paired']),
         SampleData[PairedEndSequencesWithQuality]):
-        (Collection[SampleData[PairedEndSequencesWithQuality]], Collection[BWAIndex]),
+        (SampleData[PairedEndSequencesWithQuality], BWAIndex),
     (Str % Choices(['bowtie2']),
         SampleData[PairedEndSequencesWithQuality]):
-        (Collection[SampleData[PairedEndSequencesWithQuality]], Collection[Bowtie2Index]),
+        (SampleData[PairedEndSequencesWithQuality], Bowtie2Index),
 })
 
 # register analyzeAmplicon pipeline
@@ -72,7 +72,7 @@ plugin.pipelines.register_function(
     },
     parameters={
                 'trimmer': Str,
-                'aligner_index': Str,
+                'aligner_index': Str % Choices(["bwa_index", "bowtie2_build"]),
                 'aligner': aligner_type,
                 'run_name': Str,
                 'config_fp': Str
@@ -80,8 +80,8 @@ plugin.pipelines.register_function(
     outputs=[
         ('trimmer_results', trimmer_out),
         ('aligner_index_result', index_out),
-        ('aligner_result', Collection[SampleData[AlignmentMap]]),
-        ('bam_processor_result', Collection[ASAPXML]),
+        ('aligner_result', SampleData[AlignmentMap]),
+        ('bam_processor_result', ASAPXML),
         ('output_combiner_result', ASAPXML)
     ],
     input_descriptions={
@@ -112,11 +112,11 @@ plugin.methods.register_function(
     inputs={'xml_dir': ASAPXML},
     parameters={'run_name': Str},
     outputs=[
-             ('output_dir', ASAPXML),
+             ('xml_output', ASAPXML),
              ],
     input_descriptions={'xml_dir': 'The file directory that holds xml files'},
     parameter_descriptions={'run_name': 'The name of ASAP run'},
-    output_descriptions={'output_dir': 'The output file name of the \
+    output_descriptions={'xml_output': 'The output file name of the \
 combined xml'},
     name='outputCombiner',
     description=(""),
@@ -129,13 +129,13 @@ plugin.methods.register_function(
             SampleData[SAM] | SampleData[BAMSortedAndIndexed]},
     parameters={'config_file_path': Str},
     outputs=[
-             ('xml_output_dir', ASAPXML),
+             ('xml_output_artifact', ASAPXML),
              ],
     input_descriptions={'alignment_map': 'The resulting files \
 after running aligner'},
     parameter_descriptions={'config_file_path': 'The config file \
 that holds other params'},
-    output_descriptions={'xml_output_dir': 'The xml artifact'},
+    output_descriptions={'xml_output_artifact': 'The xml artifact'},
     name='bamProcessor',
     description=(""),
     citations=[citations['ASAP']]
@@ -157,3 +157,55 @@ plugin.visualizers.register_function(
 )
 
 
+plugin.methods.register_function(
+    function=xmlCollectionCombiner,
+    inputs={'xml_collection' : Collection[ASAPXML]},
+    parameters={},
+    outputs=[
+             ('xml_output_artifact', ASAPXML),
+             ],
+    input_descriptions={'xml_collection': 'The collection of xml to combine'},
+    parameter_descriptions={},
+    output_descriptions={'xml_output_artifact': 'The xml artifact'},
+    name='xmlCollectionCombiner',
+    description=(""),
+    citations=[citations['ASAP']]
+)
+
+plugin.methods.register_function(
+    function=alignedCollectionCombiner,
+    inputs={'aligned_collection' : Collection[SampleData[AlignmentMap]] | 
+            Collection[SampleData[BAMSortedAndIndexed]] | Collection[SampleData[SAM]]},
+    parameters={},
+    outputs=[
+             ('aligned_output_artifact', SampleData[AlignmentMap]),
+             ],
+    input_descriptions={'aligned_collection': 'The collection of aligned bam files to combine'},
+    parameter_descriptions={},
+    output_descriptions={'aligned_output_artifact': 'The aligned artifact'},
+    name='alignedCollectionCombiner',
+    description=(""),
+    citations=[citations['ASAP']]
+)
+
+trimmed_collection_input, trimmed_output = TypeMap({
+    (Collection[SampleData[SequencesWithQuality]]):
+        (SampleData[SequencesWithQuality]),
+    (Collection[SampleData[PairedEndSequencesWithQuality]]):
+        (SampleData[PairedEndSequencesWithQuality]),
+})
+
+plugin.methods.register_function(
+    function=trimmedCollectionCombiner,
+    inputs={'trimmed_collection' : trimmed_collection_input },
+    parameters={},
+    outputs=[
+             ('trimmed_output_artifact', trimmed_output),
+             ],
+    input_descriptions={'trimmed_collection': 'The collection of trimmed read files to combine'},
+    parameter_descriptions={},
+    output_descriptions={'trimmed_output_artifact': 'The trimmed artifact'},
+    name='trimmedCollectionCombiner',
+    description=(""),
+    citations=[citations['ASAP']]
+)
