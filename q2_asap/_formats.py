@@ -52,3 +52,20 @@ class FormattedOutputDirFmt(DirectoryFormat):
     @html_files.set_path_maker
     def sequences_path_maker(self, sample_id):
         return f"{sample_id}.html"
+
+class ASAPJSONFormat(TextFileFormat):
+
+    def _validate_(self, level):
+        pass
+
+
+class ASAPJSONOutputDirFmt(DirectoryFormat):
+
+    json_files = FileCollection(
+        r'.*json',
+        format=ASAPJSONFormat
+    )
+
+    @json_files.set_path_maker
+    def sequences_path_maker(self, sample_id):
+        return f"{sample_id}.json"

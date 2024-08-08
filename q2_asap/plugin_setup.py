@@ -12,8 +12,8 @@ from q2_types.per_sample_sequences import (PairedEndSequencesWithQuality,
                                            SequencesWithQuality)
 from q2_types.sample_data import SampleData
 from q2_types.per_sample_sequences._type import AlignmentMap
-from ._formats import ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt
-from ._types import ASAPXML, ASAPHTML
+from ._formats import ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt, ASAPJSONOutputDirFmt
+from ._types import ASAPXML, ASAPHTML, ASAPJSON
 from q2_nasp2_types.index import BWAIndex
 from q2_nasp2_types.alignment import BAMSortedAndIndexed, SAM
 from q2_types.feature_data import FeatureData, Sequence
@@ -43,12 +43,16 @@ without warranties or conditions of any kind, either express or implied.",
     citations=[citations['Caporaso-Bolyen-2024'], citations['ASAP']]
 )
 
-plugin.register_formats(ASAPHTMLOutputDirFmt, ASAPXMLOutputDirFmt)
+plugin.register_formats(ASAPHTMLOutputDirFmt, ASAPXMLOutputDirFmt, ASAPJSONOutputDirFmt)
+
 plugin.register_semantic_type_to_format(
     ASAPHTML, artifact_format=ASAPHTMLOutputDirFmt,
 )
 plugin.register_semantic_type_to_format(
     ASAPXML, artifact_format=ASAPXMLOutputDirFmt,
+)
+plugin.register_semantic_type_to_format(
+    ASAPJSON, artifact_format=ASAPJSONOutputDirFmt,
 )
 
 # maps input types to output types

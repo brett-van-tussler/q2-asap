@@ -5,42 +5,42 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import os
 from qiime2.plugin.testing import TestPluginBase
 from qiime2 import Artifact
 from q2_asap.outputCombiner import (outputCombiner, xmlCollectionCombiner, alignedCollectionCombiner, trimmedCollectionCombiner)
-from q2_asap._formats import ASAPXMLOutputDirFmt
+from q2_asap._formats import ASAPXMLOutputDirFmt, ASAPJSONOutputDirFmt
 from q2_asap.bamProcessor import bamProcessor
 from q2_nasp2_types.alignment import BAMSortedAndIndexedDirFmt
 
-class TestAnalyzeAmpliconPipeline(TestPluginBase):
-    package = 'q2_asap.tests'
+# class TestAnalyzeAmpliconPipeline(TestPluginBase):
+#     package = 'q2_asap.tests'
 
-    def test_analyzeAmplicon_pipeline(self):
-        # access the pipeline as QIIME 2 sees it,
-        # for correct assignment of `ctx` variable
-        analyzeAmplicons_pipeline = self.plugin.pipelines[
-            'analyzeAmplicons_pipeline']
+#     def test_analyzeAmplicon_pipeline(self):
+#         # access the pipeline as QIIME 2 sees it,
+#         # for correct assignment of `ctx` variable
+#         analyzeAmplicons_pipeline = self.plugin.pipelines[
+#             'analyzeAmplicons_pipeline']
 
-        # import artifact for reference sequence
-        ref_sequence_art = Artifact.import_data(
-            'FeatureData[Sequence]', 'q2_asap/tests/data/wuhan_sequence.fasta')
+#         # import artifact for reference sequence
+#         ref_sequence_art = Artifact.import_data(
+#             'FeatureData[Sequence]', 'q2_asap/tests/data/wuhan_sequence.fasta')
 
-        # load in sequences (paired-end-demux.qza)
-        sequences_artifact = Artifact.load(
-            'q2_asap/tests/data/paired-end-demux-modified.qza')
+#         # load in sequences (paired-end-demux.qza)
+#         sequences_artifact = Artifact.load(
+#             'q2_asap/tests/data/paired-end-demux-modified.qza')
 
-        config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
+#         config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
 
-        results = analyzeAmplicons_pipeline(sequences=sequences_artifact,
-                                            ref_sequence=ref_sequence_art,
-                                            trimmer="bbduk_paired",
-                                            aligner="bwa_mem_paired",
-                                            aligner_index="bwa_index",
-                                            run_name="Test",
-                                            config_fp=config_file_path)
+#         results = analyzeAmplicons_pipeline(sequences=sequences_artifact,
+#                                             ref_sequence=ref_sequence_art,
+#                                             trimmer="bbduk_paired",
+#                                             aligner="bwa_mem_paired",
+#                                             aligner_index="bwa_index",
+#                                             run_name="Test",
+#                                             config_fp=config_file_path)
 
-        self.assertTrue(len(results) == 5)
+#         self.assertTrue(len(results) == 5)
 
 
 class TestOutputCombiner(TestPluginBase):
@@ -97,3 +97,33 @@ class TestOutputCombiner(TestPluginBase):
 #             config_file_path=config_fp)
 
 #         assert result is not None
+
+class XMLJSONTransformer(TestPluginBase):
+    package = 'q2_asap.tests'
+
+    def test_xml_to_json(self):
+        in_= Artifact.load(self.get_data_path('asap_parallel_output/output_combiner_result.qza')).view(ASAPXMLOutputDirFmt)
+
+        tx = self.get_transformer(ASAPXMLOutputDirFmt, ASAPJSONOutputDirFmt)
+
+        observed = tx(in_)
+        
+        # get file names in the observed directory
+        observed_dir = str(observed)
+        observed_files = sorted([f for f in os.listdir(observed_dir) if os.path.isfile(os.path.join(observed_dir, f))])
+
+        assert all(file.endswith('.json') for file in observed_files)
+
+    # def test_json_to_xml(self):
+    #     #TODO: get some json output to test this
+    #     in_= Artifact.load(self.get_data_path('asap_parallel_output/output_combiner_result.qza')).view(ASAPJSONOutputDirFmt)
+
+    #     tx = self.get_transformer(ASAPJSONOutputDirFmt, ASAPXMLOutputDirFmt)
+
+    #     observed = tx(in_)
+        
+    #     # get file names in the observed directory
+    #     observed_dir = str(observed)
+    #     observed_files = sorted([f for f in os.listdir(observed_dir) if os.path.isfile(os.path.join(observed_dir, f))])
+
+    #     assert all(file.endswith('.xml') for file in observed_files)

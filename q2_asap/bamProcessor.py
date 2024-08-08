@@ -1264,7 +1264,6 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         con_prop = bamProcessor["consensus_proportion"]
         fill_gap_char = bamProcessor["gap_char"]
         fill_del_char = bamProcessor["del_char"]
-        output_format = bamProcessor["output_format"]
 
         if smor:
             if proportion > 0.0:
@@ -1491,7 +1490,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         output_file_path = Path(xml_output_artifact.path) / Path(os.path.splitext(os.path.basename(alignment_map_fp))[0] + ".xml")
 
         with open(output_file_path, 'w') as file_obj:
-            _write_output(file_obj, sample_node, output_format)
+            _write_output(file_obj, sample_node)
 
     except KeyboardInterrupt:
         pass
@@ -1499,28 +1498,12 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
     return xml_output_artifact
 
 
-def _write_output(file_obj, xml_element, output_format='xml'):
-    if output_format == 'xml':
-        from xml.dom import minidom
-        dom = minidom.parseString(ElementTree.tostring(xml_element))
-        file_obj.write(dom.toprettyxml(indent="  "))
-    elif output_format == 'json':
-        xml_str = ElementTree.tostring(xml_element)
-        # The 'sample' root node is discarded
-        # as an unnecessary layer for the JSON object.
-        xml_obj = xmltodict.parse(xml_str)['sample']
-        # FIXME: The output is en/decoded multiple times because it seemed
-        # easier to use the json object_hook to ensure each key had a
-        # a consistent type then to write a nested loop with type checks
-        # and conversions modifying the object as it was traversed.
-        #
-        # Ideally the output should start as a python object that is
-        # encoded to XML or JSON once.
-        json_encoded_xml = json.loads(json.dumps(xml_obj),
-                                      object_hook=cast_json_output_types)
-        json.dump(json_encoded_xml, file_obj, separators=(',', ':'))
-    else:
-        raise Exception('unsupported output format: %s' % output_format)
+def _write_output(file_obj, xml_element):
+    
+    from xml.dom import minidom
+    dom = minidom.parseString(ElementTree.tostring(xml_element))
+    file_obj.write(dom.toprettyxml(indent="  "))
+   
 
 
 # cast_json_output_types is a json decoder object_hook intended to be used on
