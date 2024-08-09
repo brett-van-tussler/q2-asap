@@ -1,0 +1,28 @@
+[parsl]
+strategy = "None"
+
+[[parsl.executors]]
+class = "ThreadPoolExecutor"
+label = "default"
+max_threads = 10
+
+[[parsl.executors]]
+class = "HighThroughputExecutor"
+label = "htex"
+max_workers = 2
+
+[parsl.executors.provider]
+class = "SlurmProvider"
+partition="defq"
+nodes_per_block = 1
+init_blocks = 1
+min_blocks = 0
+max_blocks = 10
+walltime = "00:10:00"
+
+[parsl.executors.provider.launcher]
+class = "SingleNodeLauncher"
+
+[parsl.executor_mapping]
+some_action = "htex"
+

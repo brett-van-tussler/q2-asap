@@ -7,26 +7,35 @@
 # ----------------------------------------------------------------------------
 
 from setuptools import find_packages, setup
+import os
+from pathlib import Path
 
 import versioneer
 
-description = ("A template QIIME 2 plugin.")
+PKG_FOLDER = Path(os.path.abspath(os.path.dirname(__file__)))
+with open(PKG_FOLDER / "README.md") as f:
+    long_description = f.read()
+
+description = ("An ASAP QIIME 2 plugin")
 
 setup(
     name="q2-asap",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    license="BSD-3-Clause",
+    license="Academic and Research License",
     packages=find_packages(),
-    author="Nicole Sylvester",
-    author_email="nsylvester@tgen.org",
+    author="Nicole Sylvester and Brett Van-Tassel",
+    author_email="bvan-tassel@tgen.org",
     description=description,
-    url="https://example.com",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/TGenNorth/q2-asap",
     entry_points={
         "qiime2.plugins": [
             "q2_asap=q2_asap.plugin_setup:plugin",
             ]
     },
+    include_package_data=True,
     package_data={
         "q2_asap": ["citations.bib"],
         "q2_asap.tests": ["data/*"],

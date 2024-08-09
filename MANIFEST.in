@@ -1,2 +1,3 @@
 include versioneer.py
 include q2_asap/_version.py
+include LICENSE
