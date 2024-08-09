@@ -1,0 +1,51 @@
+{% set data = load_setup_py_data() %}
+{% set version = data.get('version') or 'placehold' %}
+
+
+package:
+  name: q2-asap
+  version: {{ version }}
+
+source:
+  # url: https://github.com/TGenNorth/q2-asap/archive/v{{ version }}.tar.gz
+  # sha256: 671e67561040ec72aabb7acaef58b24c7d15fdf6d9b1fbba30d330da17da9c0a
+  path: ../..
+
+build:
+  noarch: python
+  # script: {{ PYTHON }} -m pip install . -vv
+  script: make install
+  number: 0
+
+requirements:
+  host:
+    - python >=3.8
+    - setuptools >=64
+    - setuptools-scm >=8
+    - pip
+  run:
+    - python >=3.8
+    - pysam >=0.22.1
+    - q2-types
+    - qiime2
+    - xmltodict
+    - bwa=0.7.18
+    - bbmap=39.06
+
+# test:
+#   imports:
+#     - q2_asap
+#   commands:
+#     - pip check
+#   requires:
+#     - pip
+
+about:
+  home: https://github.com/TGenNorth/q2-asap
+  summary: A QIIME 2 ASAP plugin
+  license: NAIST-2003
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - nicolesylvester

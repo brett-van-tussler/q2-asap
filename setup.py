@@ -6,9 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from setuptools import find_packages, setup
 import os
 from pathlib import Path
+
+from setuptools import find_packages, setup
 
 import versioneer
 
@@ -35,6 +36,12 @@ setup(
             "q2_asap=q2_asap.plugin_setup:plugin",
             ]
     },
+dependencies = [
+    "q2-nasp2-types@git+https://github.com/TGenNorth/q2-nasp2-types#egg=bamUpdates",
+    "q2-aligners@git+https://github.com/TGenNorth/q2-aligners#egg=samUpdates",
+    "q2-trimmers@git+https://github.com/TGenNorth/q2-trimmers",
+    "pysam"
+        ],
     include_package_data=True,
     package_data={
         "q2_asap": ["citations.bib"],
