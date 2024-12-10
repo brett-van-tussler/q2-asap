@@ -24,6 +24,7 @@ from qiime2.util import duplicate
 from q2_nasp2_types.alignment import BAMSortedAndIndexedDirFmt
 from q2_types.per_sample_sequences import CasavaOneEightSingleLanePerSampleDirFmt
 
+
 def outputCombiner(run_name: str,
                    xml_dir: ASAPXMLOutputDirFmt) -> ASAPXMLOutputDirFmt:
 
@@ -48,10 +49,12 @@ def outputCombiner(run_name: str,
 
     return output_dir
 # TODO: clean up between test runs(test is trying to duplicate same file)
+
+
 def xmlCollectionCombiner(xml_collection: ASAPXMLOutputDirFmt) -> ASAPXMLOutputDirFmt:
 
     # print(xml_collection)
-    
+
     xml_output_artifact = ASAPXMLOutputDirFmt()
 
     for key, artifact in xml_collection.items():
@@ -60,10 +63,11 @@ def xmlCollectionCombiner(xml_collection: ASAPXMLOutputDirFmt) -> ASAPXMLOutputD
         for filename in os.listdir(artifact_dp):
             source_file = os.path.join(artifact_dp, filename)
             target_file = os.path.join(xml_output_artifact.path, filename)
-            
+
             duplicate(source_file, target_file)
-       
+
     return xml_output_artifact
+
 
 def alignedCollectionCombiner(aligned_collection: BAMSortedAndIndexedDirFmt) -> BAMSortedAndIndexedDirFmt:
     # TODO: when printing collection, we get an error 'print(aligned_collection)'
@@ -79,21 +83,22 @@ def alignedCollectionCombiner(aligned_collection: BAMSortedAndIndexedDirFmt) -> 
         for filename in os.listdir(artifact_dp):
             source_file = os.path.join(artifact_dp, filename)
             target_file = os.path.join(aligned_output_artifact.path, filename)
-            
+
             duplicate(source_file, target_file)
-       
+
     return aligned_output_artifact
 
-#TODO: confirm this works for single and paired-end
+# TODO: confirm this works for single and paired-end
+
+
 def trimmedCollectionCombiner(trimmed_collection: CasavaOneEightSingleLanePerSampleDirFmt) -> CasavaOneEightSingleLanePerSampleDirFmt:
-    
+
     # with open("trimmed_type_pipeline.txt", "w") as fh:
     #     fh.write(" ".join([str(type(i)) for i in trimmed_collection.values()]))
     #     fh.write("\n")
     #     fh.write(str(type(trimmed_collection)))
     # print(type(trimmed_collection))
     # print(trimmed_collection)
-
 
     trimmed_output_artifact = CasavaOneEightSingleLanePerSampleDirFmt()
 
@@ -107,7 +112,7 @@ def trimmedCollectionCombiner(trimmed_collection: CasavaOneEightSingleLanePerSam
         for filename in os.listdir(artifact.path):
             file_path = Path(artifact.path) / Path(filename)
             target_file = os.path.join(trimmed_output_artifact.path, filename)
-            
+
             duplicate(file_path, target_file)
-       
+
     return trimmed_output_artifact

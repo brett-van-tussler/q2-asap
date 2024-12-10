@@ -415,7 +415,7 @@ def _json_decode(json_dict):
     elif ("snp" in json_dict
           or "regionofinterest" in json_dict
           or "target" in json_dict
-    ):
+          ):
         return AND(**json_dict)
     else:
         return json_dict

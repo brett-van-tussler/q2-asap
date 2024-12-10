@@ -53,6 +53,7 @@ class FormattedOutputDirFmt(DirectoryFormat):
     def sequences_path_maker(self, sample_id):
         return f"{sample_id}.html"
 
+
 class ASAPJSONFormat(TextFileFormat):
 
     def _validate_(self, level):

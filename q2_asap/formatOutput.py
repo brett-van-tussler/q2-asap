@@ -24,9 +24,10 @@ from ._formats import ASAPXMLOutputDirFmt
 def distinct_values(context, values):
     return list(set(values))
 
+
 def list_non_html_files_recursively():
     non_html_files = []
-    
+
     # Walk through the directory tree
     for root, dirs, files in os.walk(os.getcwd()):
         for file in files:
@@ -35,8 +36,9 @@ def list_non_html_files_recursively():
                 # Calculate the relative path
                 relative_path = os.path.relpath(full_path, os.getcwd())
                 non_html_files.append(relative_path)
-    
+
     return non_html_files
+
 
 def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, stylesheet: str, text: Optional[bool] = False) -> None:
 
@@ -55,23 +57,23 @@ def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, styles
     os.mkdir(run_name)
     newdom = transform(dom)
     os.chdir(current_dir)
-    
 
     if text:
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
             fh.write(_html_template % repr(newdom))
     else:
         with open(os.path.join(output_dir, run_name + ".html"), "wb") as o:
-           o.write(ET.tostring(newdom, pretty_print=True,
-                                        xml_declaration=True,
-                                        encoding='UTF-8'))
+            o.write(ET.tostring(newdom, pretty_print=True,
+                                xml_declaration=True,
+                                encoding='UTF-8'))
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
-            format_output_link = "<a href=\"{}.html\">formatted output</a>".format(run_name)
+            format_output_link = "<a href=\"{}.html\">formatted output</a>".format(
+                run_name)
             os.chdir(output_dir)
             files = list_non_html_files_recursively()
             os.chdir(current_dir)
             file_links = ""
-            for file in files:  
+            for file in files:
                 file_links += "<br><a href=\"{0}\">{0}</a>".format(file)
             fh.write(_html_template % (format_output_link + file_links))
 

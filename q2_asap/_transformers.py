@@ -5,13 +5,15 @@ import xmltodict
 from q2_asap._formats import ASAPJSONOutputDirFmt, ASAPXMLOutputDirFmt
 from .plugin_setup import plugin
 
+
 @plugin.register_transformer
 def _1(data: ASAPXMLOutputDirFmt) -> ASAPJSONOutputDirFmt:
     json_output = ASAPJSONOutputDirFmt()
 
     xml_files = data.path.glob("*.xml")
     for xml in xml_files:
-        json_output_path = Path(json_output.path).joinpath(xml.name.replace("xml", "json"))
+        json_output_path = Path(json_output.path).joinpath(
+            xml.name.replace("xml", "json"))
         with open(xml, 'r') as xml_file:
             xml_content = xml_file.read()
 
@@ -27,13 +29,15 @@ def _1(data: ASAPXMLOutputDirFmt) -> ASAPJSONOutputDirFmt:
 
     return json_output
 
+
 @plugin.register_transformer
 def _2(data: ASAPJSONOutputDirFmt) -> ASAPXMLOutputDirFmt:
     xml_output = ASAPXMLOutputDirFmt()
 
     json_files = data.path.glob("*.json")
     for json in json_files:
-        xml_output_path = Path(xml_output.path).joinpath(json.name.replace("json", "xml"))
+        xml_output_path = Path(xml_output.path).joinpath(
+            json.name.replace("json", "xml"))
         with open(json, 'r') as json_file:
             json_content = json.load(json_file)
 
@@ -45,4 +49,3 @@ def _2(data: ASAPJSONOutputDirFmt) -> ASAPXMLOutputDirFmt:
             xml_file.write(xml_content)
 
     return xml_output
-
