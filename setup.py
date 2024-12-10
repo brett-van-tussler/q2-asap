@@ -18,7 +18,6 @@ with open(PKG_FOLDER / "README.md") as f:
     long_description = f.read()
 
 description = ("An ASAP QIIME 2 plugin")
-
 setup(
     name="q2-asap",
     version=versioneer.get_version(),
