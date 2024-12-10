@@ -4,6 +4,7 @@
 # Ignore data folder
 q2_asap/tests/data/extra_test_files/*
 q2_asap/tests/data/extra_test_files
+q2_asap/tests/data/manifest.tsv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -29,8 +29,9 @@ class TestAnalyzeAmpliconPipeline(TestPluginBase):
             'FeatureData[Sequence]', 'q2_asap/tests/data/wuhan_sequence.fasta')
 
         # load in sequences
-        sequences_artifact = Artifact.import_data('SampleData[PairedEndSequencesWithQuality]',
-                                                  'q2_asap/tests/data/paired-end-demux-modified')
+        #sequences_artifact = Artifact.import_data('SampleData[PairedEndSequencesWithQuality]',
+        #                                          'q2_asap/tests/data/paired-end-demux-modified')
+        sequences_artifact = Artifact.load('q2_asap/tests/data/paired-end-demux.qza')
 
         config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
 
