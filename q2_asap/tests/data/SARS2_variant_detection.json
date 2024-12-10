@@ -847,7 +847,7 @@
   ],
   "ASAP_parameters": {
     "bamProcessor": {
-      "json": "/home/nsylvester/scratch/q2-asap/q2_asap/tests/data/SARS2_variant_detection.json",
+      "json": "q2_asap/tests/data/SARS2_variant_detection.json",
       "depth": 100,
       "breadth": 0.8,
       "proportion": 0.1,
