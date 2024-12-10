@@ -11,7 +11,6 @@ from skbio import DNA
 from skbio.alignment import local_pairwise_align_ssw
 
 import json
-import xmltodict
 import numpy as np
 import array as arr
 from pathlib import Path
