@@ -11,7 +11,7 @@ from q2_asap import __version__
 from q2_types.per_sample_sequences import (PairedEndSequencesWithQuality,
                                            SequencesWithQuality)
 from q2_types.sample_data import SampleData
-from q2_types.per_sample_sequences._type import AlignmentMap
+from q2_types.per_sample_sequences import AlignmentMap
 from ._formats import ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt, ASAPJSONOutputDirFmt
 from ._types import ASAPXML, ASAPHTML, ASAPJSON
 from q2_nasp2_types.index import BWAIndex

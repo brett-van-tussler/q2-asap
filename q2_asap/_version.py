@@ -1,4 +1,4 @@
-# flake8: noqa
+
 # This file helps to compute a version number in source trees obtained from
 # git-archive tarball (such as those provided by githubs download-from-tag
 # feature). Distribution tarballs (built by setup.py sdist) and build
@@ -52,7 +52,7 @@ def get_config() -> VersioneerConfig:
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "q2-asap-"
+    cfg.parentdir_prefix = "q2-asap"
     cfg.versionfile_source = "q2_asap/_version.py"
     cfg.verbose = False
     return cfg
