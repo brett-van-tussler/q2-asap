@@ -55,7 +55,7 @@ def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, styles
     os.mkdir(run_name)
     newdom = transform(dom)
     os.chdir(current_dir)
-
+    
 
     if text:
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
@@ -66,7 +66,7 @@ def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, styles
                                         xml_declaration=True,
                                         encoding='UTF-8'))
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
-            format_output_link = "<a href=\"{}.html\">formatted output</a>"
+            format_output_link = "<a href=\"{}.html\">formatted output</a>".format(run_name)
             os.chdir(output_dir)
             files = list_non_html_files_recursively()
             os.chdir(current_dir)
