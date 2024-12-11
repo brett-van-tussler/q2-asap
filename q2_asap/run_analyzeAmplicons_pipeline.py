@@ -1,13 +1,13 @@
-from pathlib import Path
+# from pathlib import Path
 
 import psutil
-import qiime2
-from parsl.addresses import address_by_hostname
-from parsl.channels import LocalChannel
+# import qiime2
+# from parsl.addresses import address_by_hostname
+# from parsl.channels import LocalChannel
 from parsl.config import Config
 from parsl.executors import HighThroughputExecutor
 from parsl.executors.threads import ThreadPoolExecutor
-from parsl.launchers import SrunLauncher
+# from parsl.launchers import SrunLauncher
 from parsl.providers import LocalProvider
 from qiime2 import Cache
 from qiime2.plugins import ASAP
@@ -25,13 +25,17 @@ config = Config(
 )
 
 
-def run_analyzeAmplicons_pipeline(sequences, ref_sequence, trimmer, aligner,
-                                  aligner_index, run_name, config_fp, output_directory):
+def run_analyzeAmplicons_pipeline(
+        sequences, ref_sequence, trimmer, aligner,
+        aligner_index, run_name, config_fp, output_directory):
+
     cache = Cache()
     with cache:
         with ParallelConfig(parallel_config=config):
-            futures = ASAP.analyzeAmplicons_pipeline.parallel(sequences, ref_sequence, trimmer, aligner,
-                                                              aligner_index, run_name, config_fp)
+            futures = ASAP.analyzeAmplicons_pipeline.parallel(
+                sequences, ref_sequence, trimmer, aligner,
+                aligner_index, run_name, config_fp
+            )
             result = futures._result()
             if output_directory.exists():
                 for f in output_directory.glob("*"):

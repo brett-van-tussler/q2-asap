@@ -36,8 +36,10 @@ setup(
         ]
     },
     dependencies=[
-        "q2-nasp2-types@git+https://github.com/TGenNorth/q2-nasp2-types#egg=bamUpdates",
-        "q2-aligners@git+https://github.com/TGenNorth/q2-aligners#egg=samUpdates",
+        "q2-nasp2-types@git+https://github.com/TGenNorth/q2-nasp2-types"
+        "#egg=bamUpdates",
+        "q2-aligners@git+https://github.com/TGenNorth/q2-aligners"
+        "#egg=samUpdates",
         "q2-trimmers@git+https://github.com/TGenNorth/q2-trimmers",
         "pysam"
     ],

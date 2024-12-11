@@ -18,17 +18,16 @@ from xml.etree import ElementTree
 from xml.dom import minidom
 from ._formats import ASAPXMLOutputDirFmt
 from pathlib import Path
-from qiime2.plugin import Collection
-from ._types import ASAPXML
 from qiime2.util import duplicate
 from q2_nasp2_types.alignment import BAMSortedAndIndexedDirFmt
-from q2_types.per_sample_sequences import CasavaOneEightSingleLanePerSampleDirFmt
+from q2_types.per_sample_sequences import (
+    CasavaOneEightSingleLanePerSampleDirFmt)
 
 
 def outputCombiner(run_name: str,
                    xml_dir: ASAPXMLOutputDirFmt) -> ASAPXMLOutputDirFmt:
 
-    out_file = run_name+"_analysis.xml"
+    out_file = run_name + "_analysis.xml"
 
     # combine xmls
     root_node = ElementTree.Element("analysis", {'run_name': run_name})
@@ -44,14 +43,17 @@ def outputCombiner(run_name: str,
     output_dir = ASAPXMLOutputDirFmt()
     output = open(Path(output_dir.path) / Path(out_file), 'w')
     output.write('\n'.join([line for line in combined_xmls.toprettyxml
-                            (indent=' '*2).split('\n') if line.strip()]))
+                            (indent=' ' * 2).split('\n') if line.strip()]))
     output.close()
 
     return output_dir
 # TODO: clean up between test runs(test is trying to duplicate same file)
 
 
-def xmlCollectionCombiner(xml_collection: ASAPXMLOutputDirFmt) -> ASAPXMLOutputDirFmt:
+def xmlCollectionCombiner(
+        xml_collection:
+        ASAPXMLOutputDirFmt
+) -> ASAPXMLOutputDirFmt:
 
     # print(xml_collection)
 
@@ -69,8 +71,12 @@ def xmlCollectionCombiner(xml_collection: ASAPXMLOutputDirFmt) -> ASAPXMLOutputD
     return xml_output_artifact
 
 
-def alignedCollectionCombiner(aligned_collection: BAMSortedAndIndexedDirFmt) -> BAMSortedAndIndexedDirFmt:
-    # TODO: when printing collection, we get an error 'print(aligned_collection)'
+def alignedCollectionCombiner(
+        aligned_collection:
+        BAMSortedAndIndexedDirFmt
+) -> BAMSortedAndIndexedDirFmt:
+    # TODO: when printing collection, we get
+    # an error 'print(aligned_collection)'
     # send traceback code
 
     # print(aligned_collection)
@@ -91,10 +97,14 @@ def alignedCollectionCombiner(aligned_collection: BAMSortedAndIndexedDirFmt) -> 
 # TODO: confirm this works for single and paired-end
 
 
-def trimmedCollectionCombiner(trimmed_collection: CasavaOneEightSingleLanePerSampleDirFmt) -> CasavaOneEightSingleLanePerSampleDirFmt:
+def trimmedCollectionCombiner(
+        trimmed_collection:
+        CasavaOneEightSingleLanePerSampleDirFmt
+) -> CasavaOneEightSingleLanePerSampleDirFmt:
 
     # with open("trimmed_type_pipeline.txt", "w") as fh:
-    #     fh.write(" ".join([str(type(i)) for i in trimmed_collection.values()]))
+    #     fh.write(" ".join(
+    #       [str(type(i)) for i in trimmed_collection.values()]))
     #     fh.write("\n")
     #     fh.write(str(type(trimmed_collection)))
     # print(type(trimmed_collection))
@@ -105,7 +115,8 @@ def trimmedCollectionCombiner(trimmed_collection: CasavaOneEightSingleLanePerSam
     for key, artifact in trimmed_collection.items():
         print("ARtifact")
         # print(artifact.view(CasavaOneEightSingleLanePerSampleDirFmt).path)
-        # artifact_dp = artifact.view(CasavaOneEightSingleLanePerSampleDirFmt).path
+        # artifact_dp = artifact.view(
+        # CasavaOneEightSingleLanePerSampleDirFmt).path
         # # Move all files from value_fp to target_dir
         # for filename in os.listdir(artifact_dp):
         print(artifact)

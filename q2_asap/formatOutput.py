@@ -40,7 +40,9 @@ def list_non_html_files_recursively():
     return non_html_files
 
 
-def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, stylesheet: str, text: Optional[bool] = False) -> None:
+def formatOutput(
+        output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt,
+        stylesheet: str, text: Optional[bool] = False) -> None:
 
     ns = ET.FunctionNamespace("http://pathogen.tgen.org/ASAP/functions")
     ns['distinct-values'] = distinct_values
@@ -67,8 +69,8 @@ def formatOutput(output_dir: str, asap_xml_artifact: ASAPXMLOutputDirFmt, styles
                                 xml_declaration=True,
                                 encoding='UTF-8'))
         with open(os.path.join(output_dir, "index.html"), "w") as fh:
-            format_output_link = "<a href=\"{}.html\">formatted output</a>".format(
-                run_name)
+            format_output_link = "<a href="
+            "\"{}.html\">formatted output</a>".format(run_name)
             os.chdir(output_dir)
             files = list_non_html_files_recursively()
             os.chdir(current_dir)

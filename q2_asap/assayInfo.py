@@ -162,7 +162,7 @@ class Amplicon(object):
             output += "%s = %s\n" % (self.variant_name, self.significance)
         else:
             output += "{"
-            output += self.sequence+" "
+            output += self.sequence + " "
             for snp in self.SNPs:
                 output += "%s, " % snp
             for roi in self.ROIs:

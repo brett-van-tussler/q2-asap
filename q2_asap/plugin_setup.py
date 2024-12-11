@@ -6,13 +6,17 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Citations, Plugin, Str, TypeMap, Choices, Bool, Collection
+from qiime2.plugin import (
+    Citations, Plugin, Str,
+    TypeMap, Choices, Bool, Collection)
 from q2_asap import __version__
 from q2_types.per_sample_sequences import (PairedEndSequencesWithQuality,
                                            SequencesWithQuality)
 from q2_types.sample_data import SampleData
 from q2_types.per_sample_sequences import AlignmentMap
-from ._formats import ASAPXMLOutputDirFmt, ASAPHTMLOutputDirFmt, ASAPJSONOutputDirFmt
+from ._formats import (
+    ASAPXMLOutputDirFmt,
+    ASAPHTMLOutputDirFmt, ASAPJSONOutputDirFmt)
 from ._types import ASAPXML, ASAPHTML, ASAPJSON
 from q2_nasp2_types.index import BWAIndex
 from q2_nasp2_types.alignment import BAMSortedAndIndexed, SAM
@@ -20,7 +24,8 @@ from q2_types.feature_data import FeatureData, Sequence
 from q2_types.bowtie2 import Bowtie2Index
 from q2_asap.analyzeAmplicons_pipeline import analyzeAmplicons_pipeline
 from q2_asap.outputCombiner import (
-    outputCombiner, xmlCollectionCombiner, alignedCollectionCombiner, trimmedCollectionCombiner)
+    outputCombiner, xmlCollectionCombiner,
+    alignedCollectionCombiner, trimmedCollectionCombiner)
 from q2_asap.bamProcessor import bamProcessor
 from q2_asap.formatOutput import formatOutput
 
@@ -149,16 +154,20 @@ that holds other params'},
 
 plugin.visualizers.register_function(
     function=formatOutput,
-    inputs={'asap_xml_artifact':  ASAPXML},
+    inputs={'asap_xml_artifact': ASAPXML},
     parameters={
         'stylesheet': Str,
         'text': Bool
     },
     input_descriptions={'asap_xml_artifact': 'The combined xml file to style'},
     parameter_descriptions={'stylesheet': 'The xslt stylesheet',
-                            'text': 'Output as text bool. If you select text, the output will be stored directly into the qiime index.html file.'},
+                            'text': 'Output as text bool. If you select text, '
+                            'the output will be stored directly into the qiime '
+                            'index.html file.'},
     name='formatOutput',
-    description=("Input your own designed XSLT transform or use a pre-made one. Non html files generated will be linked in the index.html for download"),
+    description=("Input your own designed XSLT transform or use a "
+                 "pre-made one. Non html files generated will be linked "
+                 "in the index.html for download"),
     citations=[citations['ASAP']]
 )
 
@@ -181,7 +190,8 @@ plugin.methods.register_function(
 plugin.methods.register_function(
     function=alignedCollectionCombiner,
     inputs={'aligned_collection': Collection[SampleData[AlignmentMap]] |
-            Collection[SampleData[BAMSortedAndIndexed]] | Collection[SampleData[SAM]]},
+            Collection[SampleData[BAMSortedAndIndexed]] |
+            Collection[SampleData[SAM]]},
     parameters={},
     outputs=[
         ('aligned_output_artifact', SampleData[AlignmentMap]),
@@ -210,7 +220,8 @@ plugin.methods.register_function(
         ('trimmed_output_artifact', trimmed_output),
     ],
     input_descriptions={
-        'trimmed_collection': 'The collection of trimmed read files to combine'},
+        'trimmed_collection': 'The collection of trimmed read '
+        'files to combine'},
     parameter_descriptions={},
     output_descriptions={'trimmed_output_artifact': 'The trimmed artifact'},
     name='trimmedCollectionCombiner',

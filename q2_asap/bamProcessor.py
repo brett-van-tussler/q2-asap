@@ -111,11 +111,11 @@ def _primer_mask(primer_file, bam_file_name, wiggle, pmaskbam, ponlybam, smor):
             for read in samfile.fetch(chrom, until_eof=True):
                 # It seems this happens when only one read in the pair
                 # is aligned, then the mate is still associated with the CHROM
-                # but has not alignemnt position, causeing min() to fail as no
+                # but has not alignment position, causing min() to fail as no
                 # value in it
                 try:
                     # read.query_alignment_start (ead.query_alignment_end) is
-                    # what base of the read is the first thats
+                    # what base of the read is the first that's
                     # aligned to the reference
                     # first base of read that is aligned, might be useful if we
                     # consider that adapters have been remove, not using now
@@ -146,7 +146,7 @@ def _primer_mask(primer_file, bam_file_name, wiggle, pmaskbam, ponlybam, smor):
                         # TODO should output stats to log
                         # (align_end if int(forward_primer_set_end[tmp_boo].max()) > align_end else int(forward_primer_set_end[tmp_boo].max())) - align_start + read.query_alignment_start
                         # ref pos where primer ends - first ref pos where
-                        # sequence alignes + unaligned leading bases
+                        # sequence aligns + unaligned leading bases
                         mask_end = (
                             int(forward_primer_set_end[tmp_boo].max())
                             - align_start
@@ -216,7 +216,7 @@ def _primer_mask(primer_file, bam_file_name, wiggle, pmaskbam, ponlybam, smor):
         pysam.sort("-o", bam_file_out_sorted, bam_file_out)
         bam_file_out = bam_file_out_sorted
     pysam.index(bam_file_out)
-    logging.info("Wrote primer masking alignemnt only file: ", bam_file_out)
+    logging.info("Wrote primer masking alignment only file: ", bam_file_out)
     return pysam.AlignmentFile(bam_file_out, "rb")
 
 
@@ -243,13 +243,13 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
         base_counter = Counter()
         # gets incremented if smor, gets set to depth if not smor
         depth_array[pileupcolumn.pos] = 0
-        position = pileupcolumn.pos+1
+        position = pileupcolumn.pos + 1
         # This fills gaps in the alignment with n's or user defined char
         if fill_gap_char:
             # We've skipped some positions in the alignment
-            if previous_position+1 < position:
+            if previous_position + 1 < position:
                 # print("%i, %i" % (previous_position, position))
-                for i in range(previous_position+1, position):
+                for i in range(previous_position + 1, position):
                     gapfilled_consensus_seq += fill_gap_char  # Fill in the gap
         previous_position = position
         column_depth = None
@@ -288,16 +288,19 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
                     # check here
                     elif read.alignment.query_qualities[read.query_position] >= base_qual and pair.alignment.query_qualities[pair.query_position] >= base_qual:
                         # Id prefer if the BSQ were recalibrated already by ddbuk
-                        # bbmerge.sh in1=reads.F.fq in2=read.R.fq out1=corrected.F.fq out2=corrected.R.fq ecco mix
+                        # bbmerge.sh in1=reads.F.fq in2=read.R.fq
+                        # out1=corrected.F.fq out2=corrected.R.fq ecco mix
                         if pair.indel < 0 and read.indel < 0:  # This means the NEXT position is a deletion
-                            for d in range(1, min(abs(read.indel), abs(pair.indel))+1):
+                            for d in range(
+                                    1, min(abs(read.indel), abs(pair.indel)) + 1):
                                 deletion_counter.update({str(position + d)})
                         if pair.indel > 0 and read.indel > 0:  # This means the next position is an insertion
                             start = read.query_position
                             end = read.query_position + read.indel + 1
                             pstart = pair.query_position
                             pend = pair.query_position + pair.indel + 1
-                            if pair.alignment.query_sequence[pstart:pend] == alignment.query_sequence[start:end]:
+                            if pair.alignment.query_sequence[pstart:
+                                                             pend] == alignment.query_sequence[start:end]:
                                 depth_array[pileupcolumn.pos] += 1
                                 base_counter.update(
                                     {alignment.query_sequence[start:end]: 1})
@@ -343,7 +346,8 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
                 try:
                     if pileupread.is_del:
                         # This position in the alignment is a deletion in the query sequence, therefore it has no quality score
-                        # Let's use the average of the quality scores of the two aligned bases flanking the deletion
+                        # Let's use the average of the quality scores of the two
+                        # aligned bases flanking the deletion
                         qscore = (pileupread.alignment.query_qualities[pileupread.query_position_or_next] +
                                   pileupread.alignment.query_qualities[pileupread.query_position_or_next - 1]) / 2
                         if qscore >= base_qual:
@@ -353,7 +357,7 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
                     elif pileupread.alignment.query_qualities[pileupread.query_position] >= base_qual:
                         passed_Qual_filter += 1
                         if pileupread.indel < 0:  # This means the next position is a deletion, we'll process later
-                            for d in range(1, abs(pileupread.indel)+1):
+                            for d in range(1, abs(pileupread.indel) + 1):
                                 deletion_counter.update({str(position + d)})
                         if pileupread.indel > 0:  # This means the next position is an insertion, unlike with deletions, this we can process now
                             start = pileupread.query_position
@@ -376,13 +380,15 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
             #    passed_Qual_filter += deletion_counter[str(position)]
 
         if column_depth is None:  # this means did not do smor, so set column_depth to whole depth
-            # check this, changing to the reads that possed BQS filter, doing it like this as I think pileupcolumn.n is called later
+            # check this, changing to the reads that possed BQS filter, doing it
+            # like this as I think pileupcolumn.n is called later
             pileupcolumn.n = passed_Qual_filter
             # - failed_Qual_filter # check this, this will count bases that have been filtered out by quality?
             column_depth = pileupcolumn.n
             # reset to depth that passed qual filter
             depth_array[pileupcolumn.pos] = pileupcolumn.n
-        # TODO: This is going to end up being specific to these TB assays (with flanking sequence), maybe have a clever way to make this line optional
+        # TODO: This is going to end up being specific to these TB assays (with
+        # flanking sequence), maybe have a clever way to make this line optional
         if column_depth > 0:
             avg_depth_positions += 1
             avg_depth_total += column_depth
@@ -458,7 +464,7 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
                 snp = {'name': name, 'position': str(translated),
                        'depth': str(column_depth), 'reference': reference,
                        'variant': variant, 'basecalls': base_counter}
-                variant_proportion = base_counter[variant]/column_depth
+                variant_proportion = base_counter[variant] / column_depth
                 variant_count = base_counter[variant]
                 if variant_proportion >= proportion and variant_count >= mutdepth:
                     snp['significance'] = significance
@@ -497,12 +503,12 @@ def _process_pileup(pileup, amplicon, depth, proportion, mutdepth, offset,
             pileup_dict['gapfilled_consensus_sequence'] = gapfilled_consensus_seq
         pileup_dict['depths'] = ",".join(str(n) for n in depth_array)
         pileup_dict['proportions'] = ",".join(prop_array)
-    pileup_dict['breadth'] = str(breadth_positions/amplicon_length * 100)
+    pileup_dict['breadth'] = str(breadth_positions / amplicon_length * 100)
     if smor:
         pileup_dict['discards'] = ",".join(str(n) for n in discard_array)
     pileup_dict['SNPs'] = snp_list
     pileup_dict['average_depth'] = str(
-        avg_depth_total/avg_depth_positions) if avg_depth_positions else "0"
+        avg_depth_total / avg_depth_positions) if avg_depth_positions else "0"
     return pileup_dict
 
 
@@ -538,7 +544,7 @@ def _add_snp_node(parent, snp):
     snpcall = snp['variant']
     depth = int(snp['depth'])
     snpcount = base_counter[snpcall] if base_counter else 0
-    percent = snpcount/depth*100 if depth else 0
+    percent = snpcount / depth * 100 if depth else 0
     snpcall_node = ElementTree.SubElement(
         snp_node,
         'snp_call',
@@ -568,7 +574,7 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
                  reverse_comp=False):
     from operator import attrgetter
     roi_dict = {'region': roi.position_range}
-    range_match = re.search('(\d*)-(\d*)', roi.position_range)
+    range_match = re.search('(\\d*)-(\\d*)', roi.position_range)
     if not range_match:
         return roi_dict
     start = int(range_match.group(1)) - 1
@@ -598,7 +604,7 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
         roi_dict['flag'] = "region not found"
         return roi_dict
     elif not smor:  # no --smor flag
-        proportion_failed = failed/n
+        proportion_failed = failed / n
         if proportion_failed >= .95:
             logging.debug("reads are not as big as roi, merging...")
             reads = sorted(
@@ -606,7 +612,7 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
                 key=attrgetter('query_name'))
             big_reads = _process_merge(reads, start, end)
     else:  # smor
-        proportion_failed = failed/n
+        proportion_failed = failed / n
         if proportion_failed >= .95:
             roi_dict['flag'] = (
                 "reads are smaller than ROI and cannot merge because --smor")
@@ -744,7 +750,8 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
                 if len(aa_string) <= i or roi.aa_sequence[i] != aa_string[i]:
                     num_changes += 1
             aa_sequence_counter[(aa_string, num_changes)] = count
-    # This next bit is just being saved for backward compatibility. Should deprecate and remove soon
+    # This next bit is just being saved for backward compatibility. Should
+    # deprecate and remove soon
     (aa_consensus, num_changes) = aa_sequence_counter.most_common(1)[0][0]
     nt_consensus = nt_sequence_counter.most_common(1)[0][0]
     reference = roi.aa_sequence
@@ -792,7 +799,7 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
     reporting_threshold = max(mutdepth, math.ceil(
         int(roi_dict['depth']) * proportion))
     cutOff = int(roi_dict['depth']) * .02
-    range_match = re.search('(\d*)-(\d*)', roi.position_range)
+    range_match = re.search('(\\d*)-(\\d*)', roi.position_range)
     start = int(range_match.group(1)) - 1
     end = int(range_match.group(2))
     if end < start:
@@ -803,14 +810,14 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
     aa_allele_count = 0
     # calculate offsets depending on if in positive region of gene or negative
     # adding one when in negative to keep consistent with _process_pileup
-    aa_offset_pos = math.floor(offset/3)
-    aa_offset_neg = math.floor((offset+1)/3)
+    aa_offset_pos = math.floor(offset / 3)
+    aa_offset_neg = math.floor((offset + 1) / 3)
     for ((seq, aa_changes), count) in aa_seq_counter.most_common():
         if dominant_count == 0:
             dominant_count = count
         if count >= reporting_threshold:
             aa_seq_node = ElementTree.SubElement(roi_node, "amino_acid_sequence", {'count': str(
-                count), 'percent': str(count/int(roi_dict['depth'])*100), 'aa_changes': str(aa_changes)})
+                count), 'percent': str(count / int(roi_dict['depth']) * 100), 'aa_changes': str(aa_changes)})
             aa_seq_node.text = seq
             if aa_changes > 0:
                 nonsynonymous = True
@@ -831,14 +838,17 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                     change = [i, "_", seq[i]]
                     all_changes.append(change)
                     changes.append(change)
-            # check to see if aa changes are a result of an indel, and if so remove them
+            # check to see if aa changes are a result of an indel, and if so
+            # remove them
             start_of_run = _sequential(changes, 0)
             changes = changes[0:start_of_run]
             shift = 0
-            # create change string with '1' and '2' that will be replaced by <b><u> and </u></b> in post-processing
+            # create change string with '1' and '2' that will be replaced by
+            # <b><u> and </u></b> in post-processing
             for change in all_changes:
                 loc = change[0] + shift
-                # check if change is past last base in seq => an indel at the end of seq
+                # check if change is past last base in seq => an indel at the
+                # end of seq
                 if loc >= len(seq):
                     temp = seq + '1' + '_' + '2'
                 else:
@@ -846,7 +856,8 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                 shift += 2
                 seq = temp
             aa_seq_node.set('underline_seq', seq)
-            # create changes strings, adjusting the aa coordinates to be gene-relative
+            # create changes strings, adjusting the aa coordinates to be
+            # gene-relative
             if all_changes != []:
                 change_string = ""
                 for all_change in all_changes:
@@ -854,7 +865,8 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                     # beginning of the gene, then when converting to gene-based
                     # coordinates need to make offset 1 unit more positive to
                     # account for there being no 0-base in gene-coordinates
-                    if all_change[0] >= abs(aa_offset_pos) and aa_offset_pos < 0:
+                    if all_change[0] >= abs(
+                            aa_offset_pos) and aa_offset_pos < 0:
                         all_change[0] = all_change[0] + aa_offset_neg
                     else:
                         # normal case where gene encompasses the amplicon
@@ -886,7 +898,7 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
         if count >= reporting_threshold:
             nt_seq_node = ElementTree.SubElement(roi_node, "nucleotide_sequence",
                                                  {'count': str(count),
-                                                  'percent': str(count/int(roi_dict['depth'])*100)})
+                                                  'percent': str(count / int(roi_dict['depth']) * 100)})
             nt_seq_node.text = seq
             if skbio_reference:
                 # align to reference
@@ -898,23 +910,23 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                 i = 1
                 for aligned_seq_pos in alignment.iter_positions():
                     if str(aligned_seq_pos[1]) == '-':
-                        change = [i+start, str(aligned_seq_pos[0]), "_"]
+                        change = [i + start, str(aligned_seq_pos[0]), "_"]
                         all_changes.append(change)
                         changes.append(change)
-                        i = i+1
+                        i = i + 1
                     elif str(aligned_seq_pos[0]) == '-':
-                        change = [i+start, "_", str(aligned_seq_pos[1])]
+                        change = [i + start, "_", str(aligned_seq_pos[1])]
                         all_changes.append(change)
                         changes.append(change)
                         # Don't advance the counter for gaps in the reference
                     elif aligned_seq_pos[0] != aligned_seq_pos[1]:
                         change = [
-                            i+start, str(aligned_seq_pos[0]), str(aligned_seq_pos[1])]
+                            i + start, str(aligned_seq_pos[0]), str(aligned_seq_pos[1])]
                         all_changes.append(change)
                         changes.append(change)
-                        i = i+1
+                        i = i + 1
                     else:
-                        i = i+1
+                        i = i + 1
                 shift = 0
                 # create change string with '1' and '2' that will be replaced
                 # by <b><u> and </u></b> in post-processing
@@ -971,11 +983,12 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
 
     allele_count = 0
     for (seq, count) in nt_seq_counter.most_common():
-        # get most frequent alleles that have a freq of > 2% (this is an arbitrary cut-off)
+        # get most frequent alleles that have a freq of > 2% (this is an
+        # arbitrary cut-off)
         if count >= cutOff:
             allele_node = ElementTree.SubElement(roi_node, "allele_sequence",
                                                  {'count': str(count),
-                                                  'percent': str(count/int(roi_dict['depth'])*100),
+                                                  'percent': str(count / int(roi_dict['depth']) * 100),
                                                   'hash': str(hash(seq))})
             allele_node.text = seq
             allele_count += 1
@@ -984,7 +997,7 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                 allele_count += 1
                 allele_node = ElementTree.SubElement(roi_node, "allele_sequence",
                                                      {'count': str(count),
-                                                      'percent': str(count/int(roi_dict['depth'])*100),
+                                                      'percent': str(count / int(roi_dict['depth']) * 100),
                                                       'hash': str(hash(seq))})
                 allele_node.text = seq
             else:
@@ -995,17 +1008,17 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
     for mutation in roi.mutations:
         if roi.nt_sequence:
             count = nt_seq_counter[mutation]
-            mutant_proportion = count/int(roi_dict['depth'])
+            mutant_proportion = count / int(roi_dict['depth'])
         else:
             count = aa_seq_counter[next(
                 (k for k in aa_seq_counter.keys() if k[0] == mutation), None)]
-            mutant_proportion = count/int(roi_dict['depth'])
+            mutant_proportion = count / int(roi_dict['depth'])
         mutation_node = ElementTree.SubElement(
             roi_node,
             'mutation',
-            {'name': str(roi.name)+mutation,
+            {'name': str(roi.name) + mutation,
              'count': str(count),
-             'percent': str(mutant_proportion*100)})
+             'percent': str(mutant_proportion * 100)})
         mutation_node.text = mutation
         if mutant_proportion >= proportion and count >= mutdepth:
             significant = True
@@ -1064,7 +1077,7 @@ def _sequential(arr, n):
     if n == len(arr) - 1:
         return n + 1
     for i in range(n, len(arr) - 1):
-        if arr[i][0] + 1 != arr[i+1][0] and arr[i][0] + 2 != arr[i+1][0]:
+        if arr[i][0] + 1 != arr[i + 1][0] and arr[i][0] + 2 != arr[i + 1][0]:
             return _sequential(arr, i + 1)
     return n
 
@@ -1080,7 +1093,7 @@ def _add_dummy_roi_node(parent, roi):
     for mutation in roi.mutations:
         mutation_node = ElementTree.SubElement(
             roi_node, 'mutation',
-            {'name': str(roi.name)+mutation, 'count': "0", 'percent': "0"})
+            {'name': str(roi.name) + mutation, 'count': "0", 'percent': "0"})
         mutation_node.text = mutation
     return roi_node
 
@@ -1157,7 +1170,7 @@ def _process_merge(reads, start, end):
                     combined_read += read_base
                 else:
                     combined_read += pair_base
-        if len(combined_read) == end-start:
+        if len(combined_read) == end - start:
             big_aligned_reads.append(combined_read)
     return big_aligned_reads
 
@@ -1171,7 +1184,7 @@ def _merge_reads(read, pair):
     merged_read = deepcopy(read)
     if pstart <= rend:  # There is overlap that will need to be processed
         pass
-    if pstart > rend+1:  # There is a gap that will need to be filled with Ns
+    if pstart > rend + 1:  # There is a gap that will need to be filled with Ns
         pass
 
 
@@ -1294,7 +1307,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
 
         if smor:
             if proportion > 0.0:
-                # Turn off smartSMOR if user explicitely sets proportion flag
+                # Turn off smartSMOR if user explicitly sets proportion flag
                 smartSMOR = False
             else:
                 proportion = 0.001  # Set SMOR default
@@ -1319,7 +1332,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         sample_dict['unassigned_reads'] = str(samdata.nocoordinate)
         sample_dict['depth_filter'] = str(depth)
         # When doing SMOR analysis, proportion filter will be a function of
-        # SMOR count at a given postion/ROI, and will ignore passed-in value.
+        # SMOR count at a given position/ROI, and will ignore passed-in value.
         # Let's specifically set to zero, to make sure all get reported.
         if smor:
             sample_dict['SMOR'] = 'True'
@@ -1345,11 +1358,12 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
 
             logfile = "%s.log" % sample_dict['name']
 
-            logging.basicConfig(level=logging.DEBUG,
-                                format='%(asctime)s %(levelname)-8s %(message)s',
-                                datefmt='%m/%d/%Y %H:%M:%S',
-                                filename=logfile,
-                                filemode='w')
+            logging.basicConfig(
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)-8s %(message)s',
+                datefmt='%m/%d/%Y %H:%M:%S',
+                filename=logfile,
+                filemode='w')
         # its been converted to a string from the analyzeAmplicons input
         if primer_mask_file != 'False' and not wholegenome:
             samdata = _primer_mask(primer_file=primer_mask_file,
@@ -1372,16 +1386,16 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
             try:
                 offset = min(
                     int(assay.target.start_position),
-                    int(assay.target.end_position))-1
+                    int(assay.target.end_position)) - 1
                 ref_positions = list(
                     range(min(int(assay.target.start_position),
                               int(assay.target.end_position)),
                           max(int(assay.target.start_position),
-                              int(assay.target.end_position))+1))
+                              int(assay.target.end_position)) + 1))
                 # remove the zero if present
                 if 0 in ref_positions:
                     ref_positions.remove(0)
-            except:
+            except BaseException:
                 offset = 0
                 ref_positions = None
             assay_node = ElementTree.SubElement(
@@ -1390,14 +1404,22 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
             reverse_comp = assay.target.reverse_comp
             for amplicon in assay.target.amplicons:
                 if not ref_positions:
-                    ref_positions = list(range(1, len(amplicon.sequence)+1))
+                    ref_positions = list(range(1, len(amplicon.sequence) + 1))
                 temp_file = None
-                ref_name = assay.name + \
-                    "_%s" % amplicon.variant_name if amplicon.variant_name else assay.name
+                ref_name = (
+                                assay.name +
+                                "_%s" % amplicon.variant_name
+                                if amplicon.variant_name
+                                else assay.name
+                            )
                 amplicon_dict = {}
                 seq_counter = None
                 if percid:
-                    (temp_file, discarded_reads, seq_counter) = _verify_percent_identity(
+                    (
+                        temp_file,
+                        discarded_reads,
+                        seq_counter
+                        ) = _verify_percent_identity(
                         samdata, ref_name, amplicon, percid, merge)
                     samdata = pysam.AlignmentFile(temp_file, "rb")
                     amplicon_dict['discarded_reads'] = str(discarded_reads)
@@ -1479,7 +1501,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
                                                     smor, base_qual, con_prop,
                                                     fill_gap_char,
                                                     fill_del_char)
-                    if float(amplicon_data['breadth']) < breadth*100:
+                    if float(amplicon_data['breadth']) < breadth * 100:
                         significance_node = amplicon_node.find("significance")
                         if significance_node is None:
                             significance_node = ElementTree.SubElement(
@@ -1510,7 +1532,7 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
                 if temp_file:
                     samdata.close()
                     os.remove(temp_file)
-                    os.remove(temp_file+".bai")
+                    os.remove(temp_file + ".bai")
                     samdata = pysam.AlignmentFile(alignment_map_fp, "rb")
 
         if samdata.is_open():
