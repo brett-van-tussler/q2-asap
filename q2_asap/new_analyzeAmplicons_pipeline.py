@@ -1,9 +1,5 @@
-from q2_types.per_sample_sequences import CasavaOneEightSingleLanePerSampleDirFmt
-
-
 def analyzeAmplicons_pipeline(ctx, sequences, ref_sequence, trimmer, aligner,
                               aligner_index, run_name, config_fp):
-
     trimmer_action = ctx.get_action('trimmers', trimmer)
     aligner_index_action = ctx.get_action('aligners', aligner_index)
     aligner_action = ctx.get_action('aligners', aligner)
@@ -35,8 +31,10 @@ def analyzeAmplicons_pipeline(ctx, sequences, ref_sequence, trimmer, aligner,
         aligner_result = aligner_action(seq, aligner_index_result).output_bam
         aligner_result_dict[sample_id + "_aligned"] = aligner_result
 
-        bam_processor_result = bam_processor_action(alignment_map=aligner_result,
-                                                    config_file_path=config_fp).xml_output_artifact
+        bam_processor_result = bam_processor_action(
+            alignment_map=aligner_result,
+            config_file_path=config_fp
+            ).xml_output_artifact
         bam_processor_result_dict[sample_id + "_xml"] = bam_processor_result
 
     trimmed_results_combined = trimmed_collection_combiner(

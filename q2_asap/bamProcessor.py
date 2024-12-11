@@ -696,7 +696,14 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
             if alignment_length1 != alignment_length2:
                 continue
             # Throw out reads that don't cover the whole ROI
-            if not rend1 or not rend2 or rstart1 > start or rstart2 > start or rend1 < end or rend2 < end:
+            if (
+                not rend1
+                or not rend2
+                or rstart1 > start
+                or rstart2 > start
+                or rend1 < end
+                or rend2 < end
+            ):
                 continue
             if rstart1 <= start:
                 if not use_query_alignment_seq:
@@ -724,7 +731,11 @@ def _process_roi(roi, samdata, amplicon_ref, smor, amplicon_ref_len,
                     # the ROI is the whole ref so
                     # can use .query_alignment_sequence
                     nt_sequence2 = DNA(pair.query_alignment_sequence)
-            if not nt_sequence or not nt_sequence2 or nt_sequence != nt_sequence2:
+            if (
+                not nt_sequence
+                or not nt_sequence2
+                or nt_sequence != nt_sequence2
+            ):
                 continue
             else:
                 if reverse_comp:
@@ -805,9 +816,11 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
     if end < start:
         reverse_comp = True
         start, end = end, start
-    dominant_count = 0  # Number of reads containing the most common amino acid sequence
+    dominant_count = 0
+    # Number of reads containing the
+    # most common amino acid sequence
     aa_seq_counter = roi_dict['aa_sequence_distribution']
-    aa_allele_count = 0
+
     # calculate offsets depending on if in positive region of gene or negative
     # adding one when in negative to keep consistent with _process_pileup
     aa_offset_pos = math.floor(offset / 3)
@@ -816,8 +829,11 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
         if dominant_count == 0:
             dominant_count = count
         if count >= reporting_threshold:
-            aa_seq_node = ElementTree.SubElement(roi_node, "amino_acid_sequence", {'count': str(
-                count), 'percent': str(count / int(roi_dict['depth']) * 100), 'aa_changes': str(aa_changes)})
+            aa_seq_node = ElementTree.SubElement(
+                roi_node, "amino_acid_sequence", {
+                    'count': str(count),
+                    'percent': str(count / int(roi_dict['depth']) * 100),
+                    'aa_changes': str(aa_changes)})
             aa_seq_node.text = seq
             if aa_changes > 0:
                 nonsynonymous = True
@@ -896,14 +912,16 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
         skbio_reference = DNA(roi.nt_sequence)
     for (seq, count) in nt_seq_counter.most_common():
         if count >= reporting_threshold:
-            nt_seq_node = ElementTree.SubElement(roi_node, "nucleotide_sequence",
-                                                 {'count': str(count),
-                                                  'percent': str(count / int(roi_dict['depth']) * 100)})
+            nt_seq_node = ElementTree.SubElement(
+                roi_node, "nucleotide_sequence",
+                {'count': str(count),
+                 'percent': str(
+                    count / int(roi_dict['depth']) * 100)})
             nt_seq_node.text = seq
             if skbio_reference:
                 # align to reference
-                alignment, score, start_end_positions = local_pairwise_align_ssw(
-                    skbio_reference, DNA(seq))
+                alignment, score, pos_range = local_pairwise_align_ssw(
+                        skbio_reference, DNA(seq))
                 # get string of the nt changes
                 changes = []
                 all_changes = []
@@ -921,7 +939,9 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
                         # Don't advance the counter for gaps in the reference
                     elif aligned_seq_pos[0] != aligned_seq_pos[1]:
                         change = [
-                            i + start, str(aligned_seq_pos[0]), str(aligned_seq_pos[1])]
+                            i + start, str(aligned_seq_pos[0]),
+                            str(aligned_seq_pos[1])
+                            ]
                         all_changes.append(change)
                         changes.append(change)
                         i = i + 1
@@ -986,19 +1006,22 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
         # get most frequent alleles that have a freq of > 2% (this is an
         # arbitrary cut-off)
         if count >= cutOff:
-            allele_node = ElementTree.SubElement(roi_node, "allele_sequence",
-                                                 {'count': str(count),
-                                                  'percent': str(count / int(roi_dict['depth']) * 100),
-                                                  'hash': str(hash(seq))})
+            allele_node = ElementTree.SubElement(
+                roi_node, "allele_sequence",
+                {'count': str(count),
+                 'percent': str(count / int(roi_dict['depth']) * 100),
+                 'hash': str(hash(seq))})
             allele_node.text = seq
             allele_count += 1
         else:
             if allele_count < 2:
                 allele_count += 1
-                allele_node = ElementTree.SubElement(roi_node, "allele_sequence",
-                                                     {'count': str(count),
-                                                      'percent': str(count / int(roi_dict['depth']) * 100),
-                                                      'hash': str(hash(seq))})
+                allele_node = ElementTree.SubElement(
+                    roi_node, "allele_sequence",
+                    {'count': str(count),
+                     'percent': str(count / int(roi_dict['depth']) * 100),
+                     'hash': str(hash(seq))
+                     })
                 allele_node.text = seq
             else:
                 break
@@ -1037,7 +1060,9 @@ def _add_roi_node(parent, roi, roi_dict, depth, proportion, mutdepth,
             significance_node.set("level", "low")
         elif high_level:
             significance_node.set("level", "high")
-    elif len(roi.mutations) == 0 and dominant_count >= mutdepth and (('changes' in roi_dict and int(roi_dict['changes']) > 0) or nonsynonymous):
+    elif len(roi.mutations) == 0 and dominant_count >= mutdepth and (
+            ('changes' in roi_dict and int(roi_dict['changes']) > 0)
+            or nonsynonymous):
         significance_node = ElementTree.SubElement(
             roi_node, "significance", {'changes': roi_dict['changes']})
         significance_node.text = roi.significance.message
@@ -1318,7 +1343,6 @@ def bamProcessor(alignment_map: BAMSortedAndIndexedDirFmt,
         assay_list = parseJSON(json_fp)
         # TODO: dont leave this line validate only one is found
         alignment_map_fp = glob.glob(str(alignment_map.path) + "/*.bam")[0]
-        check_index = glob.glob(str(alignment_map.path) + "/*.bam*")
         samdata = pysam.AlignmentFile(alignment_map_fp, "rb")
 
         sample_dict = {}

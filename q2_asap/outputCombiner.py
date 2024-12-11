@@ -12,7 +12,6 @@ asap.outputCombiner
 
 @contact:    dlemmer@tgen.org
 '''
-
 import os
 from xml.etree import ElementTree
 from xml.dom import minidom
