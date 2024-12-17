@@ -48,6 +48,16 @@ Finally, run:
 pip install .
 ```
 
+Install some q2-asap requirements manually like so
+```shell
+conda install pytest flake8
+conda install git
+conda install -c conda-forge versioneer
+conda install -c bioconda bbmap
+conda install -c bioconda bwa
+conda install -c bioconda bowtie2
+```
+
 ## Testing `q2-asap`
 
 After completing the install steps above, confirm that everything is working as expected by running:
