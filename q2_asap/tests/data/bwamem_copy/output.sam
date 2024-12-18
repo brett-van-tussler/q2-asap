@@ -1,0 +1,8 @@
+@HD	VN:1.6	SO:coordinate
+@SQ	SN:Wuhan_Hu_1	LN:29903
+@RG	ID:SARS2_1424866_0	SM:SARS2_1424866_0
+@PG	ID:bwa	PN:bwa	VN:0.7.17-r1188	CL:bwa mem -R @RG\tID:SARS2_1424866_0\tSM:SARS2_1424866_0 -k 51 -L 20 -t 4 /scratch/nsylvester/q2-asap/Test3/asap_output/reference.fasta /scratch/nsylvester/q2-asap/Test3/asap_output/trimmed/SARS2_1424866_0_R1_trimmed.fastq.gz /scratch/nsylvester/q2-asap/Test3/asap_output/trimmed/SARS2_1424866_0_R2_trimmed.fastq.gz
+@PG	ID:samtools	PN:samtools	PP:bwa	VN:1.14	CL:samtools view -S -b -h -
+@PG	ID:samtools.1	PN:samtools	PP:samtools	VN:1.14	CL:samtools sort -T SARS2_1424866_0-bwamem -o /scratch/nsylvester/q2-asap/Test3/asap_output/bwamem/SARS2_1424866_0-bwamem.bam -
+@PG	ID:samtools.2	PN:samtools	PP:samtools.1	VN:1.20	CL:samtools view -h /home/nsylvester/scratch/q2-asap/Test3/asap_output/bwamem_copy/SARS2_1424866_0-bwamem.bam
+@PG	ID:samtools.3	PN:samtools	PP:samtools.2	VN:1.20	CL:samtools view -bS SARS2_1424866_0-bwamem.sam

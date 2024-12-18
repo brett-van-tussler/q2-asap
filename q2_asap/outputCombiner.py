@@ -78,8 +78,6 @@ def alignedCollectionCombiner(
     # an error 'print(aligned_collection)'
     # send traceback code
 
-    # print(aligned_collection)
-
     aligned_output_artifact = BAMSortedAndIndexedDirFmt()
 
     for key, artifact in aligned_collection.items():
@@ -112,7 +110,7 @@ def trimmedCollectionCombiner(
     trimmed_output_artifact = CasavaOneEightSingleLanePerSampleDirFmt()
 
     for key, artifact in trimmed_collection.items():
-        print("ARtifact")
+        print("Artifact")
         # print(artifact.view(CasavaOneEightSingleLanePerSampleDirFmt).path)
         # artifact_dp = artifact.view(
         # CasavaOneEightSingleLanePerSampleDirFmt).path

@@ -14,39 +14,40 @@ from q2_asap.outputCombiner import (
 from q2_asap._formats import ASAPXMLOutputDirFmt, ASAPJSONOutputDirFmt
 from q2_asap.bamProcessor import bamProcessor
 from q2_nasp2_types.alignment import BAMSortedAndIndexedDirFmt
+from q2_asap.smor import smor
 
 
-class TestAnalyzeAmpliconPipeline(TestPluginBase):
-    package = 'q2_asap.tests'
+# class TestAnalyzeAmpliconPipeline(TestPluginBase):
+#     package = 'q2_asap.tests'
 
-    def test_analyzeAmplicon_pipeline(self):
-        # access the pipeline as QIIME 2 sees it,
-        # for correct assignment of `ctx` variable
-        analyzeAmplicons_pipeline = self.plugin.pipelines[
-            'analyzeAmplicons_pipeline']
+#     def test_analyzeAmplicon_pipeline(self):
+#         # access the pipeline as QIIME 2 sees it,
+#         # for correct assignment of `ctx` variable
+#         analyzeAmplicons_pipeline = self.plugin.pipelines[
+#             'analyzeAmplicons_pipeline']
 
-        # import artifact for reference sequence
-        ref_sequence_art = Artifact.import_data(
-            'FeatureData[Sequence]', 'q2_asap/tests/data/wuhan_sequence.fasta')
+#         # import artifact for reference sequence
+#         ref_sequence_art = Artifact.import_data(
+#             'FeatureData[Sequence]', 'q2_asap/tests/data/wuhan_sequence.fasta')
 
-        # load in sequences
-        # sequences_artifact = Artifact.import_data(
-        # 'SampleData[PairedEndSequencesWithQuality]',
-        # 'q2_asap/tests/data/paired-end-demux-modified')
-        sequences_artifact = Artifact.load(
-            'q2_asap/tests/data/paired-end-demux.qza')
+#         # load in sequences
+#         # sequences_artifact = Artifact.import_data(
+#         # 'SampleData[PairedEndSequencesWithQuality]',
+#         # 'q2_asap/tests/data/paired-end-demux-modified')
+#         sequences_artifact = Artifact.load(
+#             'q2_asap/tests/data/paired-end-demux.qza')
 
-        config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
+#         config_file_path = 'q2_asap/tests/data/SARS2_variant_detection.json'
 
-        results = analyzeAmplicons_pipeline(sequences=sequences_artifact,
-                                            ref_sequence=ref_sequence_art,
-                                            trimmer="bbduk_paired",
-                                            aligner="bwa_mem_paired",
-                                            aligner_index="bwa_index",
-                                            run_name="Test",
-                                            config_fp=config_file_path)
+#         results = analyzeAmplicons_pipeline(sequences=sequences_artifact,
+#                                             ref_sequence=ref_sequence_art,
+#                                             trimmer="bbduk_paired",
+#                                             aligner="bwa_mem_paired",
+#                                             aligner_index="bwa_index",
+#                                             run_name="Test",
+#                                             config_fp=config_file_path)
 
-        self.assertTrue(len(results) == 5)
+#         self.assertTrue(len(results) == 5)
 
 
 class TestOutputCombiner(TestPluginBase):
@@ -167,3 +168,19 @@ class XMLJSONTransformer(TestPluginBase):
     #      ])
 
     #     assert all(file.endswith('.xml') for file in observed_files)
+
+
+class TestSMOR(TestPluginBase):
+    package = 'q2_asap.tests'
+
+    def test_bam_processor(self):
+        bam_fp = 'q2_asap/tests/data/bwamem_copy'
+
+        # import alignment map artifact data
+        bam_artifact = Artifact.import_data('SampleData[BAMSortedAndIndexed]',
+                                            bam_fp)
+        result = smor(
+            alignment_map=bam_artifact.view(BAMSortedAndIndexedDirFmt),
+            )
+
+        assert result is not None

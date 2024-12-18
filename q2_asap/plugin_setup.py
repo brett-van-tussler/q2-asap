@@ -28,6 +28,7 @@ from q2_asap.outputCombiner import (
     alignedCollectionCombiner, trimmedCollectionCombiner)
 from q2_asap.bamProcessor import bamProcessor
 from q2_asap.formatOutput import formatOutput
+from q2_asap.smor import smor
 
 citations = Citations.load("citations.bib", package="q2_asap")
 
@@ -37,10 +38,11 @@ plugin = Plugin(
     website="https://example.com",
     package="q2_asap",
     description="Copyright 2015 TGen North. All rights reserved. \
-Available for academic and research use only under a license from \
-The Translational Genomics Research Institute (TGen) \
-that is free for non-commercial use. Distributed on an 'AS IS' basis \
-without warranties or conditions of any kind, either express or implied.",
+        Available for academic and research use only under a license from \
+        The Translational Genomics Research Institute (TGen) \
+        that is free for non-commercial use. Distributed on an 'AS IS' basis \
+        without warranties or conditions of any kind, either express or \
+        implied.",
 
     short_description="ASAP plugin",
     # Please retain the plugin-level citation of 'Caporaso-Bolyen-2024'
@@ -109,7 +111,7 @@ plugin.pipelines.register_function(
         'trimmer_results': 'The result after completing trimming',
         'aligner_index_result': 'The resulting aligner index',
         'aligner_result': 'The result of aligning reads \
-with specified aligner',
+            with specified aligner',
         'bam_processor_result': 'The result of bam processing',
         'output_combiner_result': 'The resulting combined xml'
     },
@@ -128,7 +130,7 @@ plugin.methods.register_function(
     input_descriptions={'xml_dir': 'The file directory that holds xml files'},
     parameter_descriptions={'run_name': 'The name of ASAP run'},
     output_descriptions={'xml_output': 'The output file name of the \
-combined xml'},
+        combined xml'},
     name='outputCombiner',
     description=(""),
     citations=[citations['ASAP']]
@@ -143,9 +145,9 @@ plugin.methods.register_function(
         ('xml_output_artifact', ASAPXML),
     ],
     input_descriptions={'alignment_map': 'The resulting files \
-after running aligner'},
+        after running aligner'},
     parameter_descriptions={'config_file_path': 'The config file \
-that holds other params'},
+        that holds other params'},
     output_descriptions={'xml_output_artifact': 'The xml artifact'},
     name='bamProcessor',
     description=(""),
@@ -225,6 +227,24 @@ plugin.methods.register_function(
     parameter_descriptions={},
     output_descriptions={'trimmed_output_artifact': 'The trimmed artifact'},
     name='trimmedCollectionCombiner',
+    description=(""),
+    citations=[citations['ASAP']]
+)
+
+plugin.methods.register_function(
+    function=smor,
+    inputs={'alignment_map': SampleData[AlignmentMap] |
+            SampleData[SAM] | SampleData[BAMSortedAndIndexed]},
+    parameters={},
+    outputs=[
+        ('smor_alignment_file', SampleData[AlignmentMap]),
+    ],
+    input_descriptions={'alignment_map': 'The resulting files \
+        after running aligner'},
+    parameter_descriptions={},
+    output_descriptions={'smor_alignment_file': 'combined alignments\
+        keeping the higher quality of the two reads'},
+    name='smor',
     description=(""),
     citations=[citations['ASAP']]
 )
